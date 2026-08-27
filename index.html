@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mock Interview Simulator</title>
+    <!-- Strong typography: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Fixed Ambient Glows -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <main id="app-container">
+        
+        <!-- HOME SCREEN -->
+        <section id="screen-home" class="screen active">
+            <!-- 3D Decorative Scene -->
+            <div class="scene-container" aria-hidden="true">
+                <div class="orb-main home-orb"></div>
+                <div class="orb-small home-small-orb"></div>
+                <div class="orbit-ring home-ring"></div>
+                <div class="geo-object home-geo"></div>
+            </div>
+
+            <header class="navbar">
+                <div class="branding">AI Interviewer</div>
+            </header>
+            <div class="content-center home-layout">
+                <div class="hero-content">
+                    <h1 class="hero-heading">Practice smarter.<br><span class="gradient-text">Interview better.</span></h1>
+                    <p class="hero-subtext">Role-based mock interviews with instant, explainable feedback.</p>
+                    <button id="btn-start" class="btn-primary btn-glow">Start Interview &rarr;</button>
+                </div>
+                
+                <div class="feature-cards">
+                    <div class="feature-card card-glass">
+                        <h3>3 Roles</h3>
+                        <p>Software, Data, Marketing</p>
+                    </div>
+                    <div class="feature-card card-glass">
+                        <h3>Instant Feedback</h3>
+                        <p>Rule-based insights on answers</p>
+                    </div>
+                    <div class="feature-card card-glass">
+                        <h3>Rule-Based Analysis</h3>
+                        <p>Transparent and explainable</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETUP SCREEN -->
+        <section id="screen-setup" class="screen hidden">
+            <!-- 3D Decorative Scene -->
+            <div class="scene-container" aria-hidden="true">
+                <div class="orb-main setup-orb"></div>
+                <div class="orb-small setup-small-orb"></div>
+            </div>
+
+            <header class="navbar">
+                <div class="branding">AI Interviewer</div>
+            </header>
+            <div class="content-center">
+                <div class="setup-header">
+                    <h2 class="hero-heading" style="font-size: 2.5rem;">Choose your role</h2>
+                    <p class="hero-subtext" style="margin:0 auto;">Select a role to start your mock interview.</p>
+                </div>
+                
+                <div class="role-cards" id="role-container">
+                    <button class="role-card card-glass" data-role="Software Engineer">
+                        <div class="role-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        </div>
+                        <h3>Software Engineer</h3>
+                    </button>
+                    <button class="role-card card-glass" data-role="Data Analyst">
+                        <div class="role-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </div>
+                        <h3>Data Analyst</h3>
+                    </button>
+                    <button class="role-card card-glass" data-role="Marketing">
+                        <div class="role-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                        </div>
+                        <h3>Marketing</h3>
+                    </button>
+                </div>
+                
+                <div class="setup-info-strip">
+                    <span><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg> 5 Questions</span>
+                    <span><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 60 Seconds</span>
+                    <span><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Instant Feedback</span>
+                </div>
+
+                <div class="setup-controls">
+                    <button id="btn-begin-interview" class="btn-primary btn-glow" disabled>Start Interview</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERVIEW SCREEN -->
+        <section id="screen-interview" class="screen hidden">
+            <!-- 3D Decorative Scene -->
+            <div class="scene-container" aria-hidden="true">
+                <div class="orb-main interview-orb"></div>
+                <div class="orbit-ring interview-ring"></div>
+            </div>
+
+            <div class="interview-container">
+                <header class="interview-header">
+                    <span id="interview-role-label" class="role-badge">Role</span>
+                    <span id="interview-question-tracker" class="question-tracker">Question 1/5</span>
+                </header>
+                
+                <div class="progress-track" aria-label="Interview Progress">
+                    <div class="progress-step"></div>
+                    <div class="progress-step"></div>
+                    <div class="progress-step"></div>
+                    <div class="progress-step"></div>
+                    <div class="progress-step"></div>
+                </div>
+                
+                <div class="question-container">
+                    <h2 id="current-question-text" class="question-text"></h2>
+                    
+                    <div class="timer-container" aria-live="polite">
+                        <div class="timer-circle">
+                            <span id="timer-text">60s</span>
+                        </div>
+                    </div>
+
+                    <div class="input-area">
+                        <label for="answer-input" class="sr-only">Your answer</label>
+                        <textarea id="answer-input" placeholder="Type your answer here..." aria-label="Your answer"></textarea>
+                        
+                        <div class="interview-controls">
+                            <span id="word-count" class="word-count">0 words</span>
+                            <button id="btn-submit-answer" class="btn-primary btn-glow">Submit Answer &rarr;</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Feedback container (Hidden by default) -->
+                    <div id="feedback-container" class="feedback-card card-glass hidden" aria-live="polite">
+                        <div class="feedback-header">
+                            <div class="score-display">
+                                <span class="score-value">0</span><span class="score-max">/ 100</span>
+                            </div>
+                            <div>
+                                <h3 style="margin:0; font-size:1.15rem; color:var(--primary-dark)">Analysis Complete</h3>
+                                <p style="margin:0; font-size:0.95rem; color:var(--text-secondary)">Rule-based evaluation</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feedback-grid">
+                            <div class="feedback-section strengths">
+                                <h4>Strengths</h4>
+                                <ul></ul>
+                            </div>
+                            <div class="feedback-section missing">
+                                <h4>Missing</h4>
+                                <ul></ul>
+                            </div>
+                        </div>
+                        
+                        <div class="feedback-section improve" style="margin-bottom: 1.5rem;">
+                            <h4>Improve</h4>
+                            <p></p>
+                        </div>
+                        
+                        <div class="feedback-section breakdown">
+                            <h4>Why this score?</h4>
+                            <div class="breakdown-row"><span>Concept Coverage</span> <span>0%</span></div>
+                            <div class="breakdown-row"><span>Answer Quality</span> <span>0%</span></div>
+                            <div class="breakdown-row"><span>Structure & Clarity</span> <span>0%</span></div>
+                            <div class="breakdown-row"><span>Communication</span> <span>0%</span></div>
+                        </div>
+
+                        <div class="feedback-action">
+                            <button id="btn-next-question" class="btn-primary btn-glow">Next Question &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESULTS SCREEN -->
+        <section id="screen-results" class="screen hidden">
+            <!-- 3D Decorative Scene -->
+            <div class="scene-container" aria-hidden="true">
+                <div class="orb-small results-orb-left"></div>
+                <div class="orb-main results-orb-right"></div>
+            </div>
+
+            <header class="navbar">
+                <div class="branding">AI Interviewer</div>
+            </header>
+            <div class="content-center results-content">
+                <div class="results-header">
+                    <h2>Final Results</h2>
+                    <p class="hero-subtext" style="margin:0 auto;">Here is your rule-based performance analysis.</p>
+                </div>
+                
+                <div class="score-ring-wrapper">
+                    <div class="overall-score">
+                        <span class="score-number">0</span>
+                        <span class="score-max">/ 100</span>
+                    </div>
+                </div>
+                
+                <h3 class="readiness-label" style="margin-bottom: 3rem;"></h3>
+                
+                <div class="results-grid">
+                    <div class="category-breakdown card-glass">
+                        <h4>Performance Breakdown</h4>
+                        <div class="breakdown-row"><span>Concept Coverage</span><span>0</span></div>
+                        <div class="breakdown-row"><span>Answer Quality</span><span>0</span></div>
+                        <div class="breakdown-row"><span>Structure & Clarity</span><span>0</span></div>
+                        <div class="breakdown-row"><span>Communication</span><span>0</span></div>
+                    </div>
+
+                    <div class="feedback-summary card-glass">
+                        <div class="strengths-section" style="margin-bottom: 1.5rem;">
+                            <h4 style="color: var(--success); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.85rem; font-weight: 800;">Strengths</h4>
+                            <ul id="results-strengths" style="list-style:none; padding:0; margin:0; font-size:1rem; color:var(--text-primary);">
+                            </ul>
+                        </div>
+                        <div class="improvements-section">
+                            <h4 style="color: var(--warning); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.85rem; font-weight: 800;">Areas to Improve</h4>
+                            <ul id="results-improvements" style="list-style:none; padding:0; margin:0; font-size:1rem; color:var(--text-primary);">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-review-section card-glass" style="margin-bottom: 3.5rem; text-align: left;">
+                    <h4 style="font-size: 1.15rem; color: var(--primary-dark); margin-bottom: 1.25rem; font-weight: 700;">Question Review</h4>
+                    <div id="results-question-review" style="display:flex; flex-direction:column; gap:1.5rem;">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <div class="results-controls">
+                    <button id="btn-retry" class="btn-primary btn-glow">Try Again</button>
+                    <button id="btn-home" class="btn-secondary">Home</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- JavaScript Modules -->
+    <script src="js/animations.js"></script>
+    <script src="js/questions.js"></script>
+    <script src="js/analyzer.js"></script>
+    <script src="js/feedback.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
