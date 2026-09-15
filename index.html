@@ -91,6 +91,31 @@
                     </button>
                 </div>
                 
+                <div class="setup-header" style="margin-top: 2rem;">
+                    <h3 class="hero-heading" style="font-size: 1.8rem;">Select Difficulty</h3>
+                </div>
+                
+                <div class="role-cards" id="difficulty-container">
+                    <button class="role-card card-glass" data-difficulty="Easy">
+                        <h3>Easy</h3>
+                    </button>
+                    <button class="role-card card-glass" data-difficulty="Intermediate">
+                        <h3>Intermediate</h3>
+                    </button>
+                    <button class="role-card card-glass" data-difficulty="Hard">
+                        <h3>Hard</h3>
+                    </button>
+                </div>
+
+                <div class="api-key-container card-glass" style="margin: 2rem auto; max-width: 600px; padding: 1.5rem; text-align: left;">
+                    <h4 style="margin-top: 0;">Optional: Gemini API Key (Demo)</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Demo API key — used only for this session for generative questions.<br>
+                        Do not use a production API key in a client-side application.
+                    </p>
+                    <input type="password" id="gemini-api-key" placeholder="Enter Gemini API Key (optional)" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary); font-family: inherit;">
+                </div>
+
                 <div class="setup-info-strip">
                     <span><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg> 5 Questions</span>
                     <span><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 60 Seconds</span>

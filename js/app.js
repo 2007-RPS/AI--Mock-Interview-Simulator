@@ -1,5 +1,7 @@
 const state = {
     selectedRole: null,
+    difficulty: null,
+    geminiApiKey: null,
     questions: [],
     currentQuestionIndex: 0,
     answers: [],
@@ -13,16 +15,40 @@ document.getElementById("btn-start").addEventListener("click", () => {
     ui.showScreen(ui.setupScreen);
 });
 
+function checkStartReady() {
+    if (state.selectedRole && state.difficulty) {
+        ui.btnBegin.disabled = false;
+    } else {
+        ui.btnBegin.disabled = true;
+    }
+}
+
 ui.roleCards.forEach(card => {
     card.addEventListener("click", (e) => {
         const btn = e.currentTarget;
         state.selectedRole = btn.getAttribute("data-role");
-        ui.selectRoleCard(btn);
+        ui.roleCards.forEach(c => c.classList.remove("selected"));
+        btn.classList.add("selected");
+        checkStartReady();
     });
 });
 
+ui.difficultyCards.forEach(card => {
+    card.addEventListener("click", (e) => {
+        const btn = e.currentTarget;
+        state.difficulty = btn.getAttribute("data-difficulty");
+        ui.difficultyCards.forEach(c => c.classList.remove("selected"));
+        btn.classList.add("selected");
+        checkStartReady();
+    });
+});
+
+ui.geminiApiKeyInput.addEventListener("input", (e) => {
+    state.geminiApiKey = e.target.value.trim() || null;
+});
+
 ui.btnBegin.addEventListener("click", () => {
-    if (!state.selectedRole) return;
+    if (!state.selectedRole || !state.difficulty) return;
     startInterview();
 });
 
@@ -115,6 +141,8 @@ function finishInterview() {
 
 function resetApp() {
     state.selectedRole = null;
+    state.difficulty = null;
+    state.geminiApiKey = null;
     state.questions = [];
     state.currentQuestionIndex = 0;
     state.answers = [];
@@ -124,6 +152,8 @@ function resetApp() {
     timer.stop();
     
     ui.roleCards.forEach(c => c.classList.remove("selected"));
+    ui.difficultyCards.forEach(c => c.classList.remove("selected"));
+    ui.geminiApiKeyInput.value = "";
     ui.btnBegin.disabled = true;
     
     ui.showScreen(ui.homeScreen);

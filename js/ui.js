@@ -6,7 +6,9 @@ const ui = {
     resultsScreen: document.getElementById("screen-results"),
     
     // Setup UI
-    roleCards: document.querySelectorAll(".role-card"),
+    roleCards: document.querySelectorAll(".role-card[data-role]"),
+    difficultyCards: document.querySelectorAll(".role-card[data-difficulty]"),
+    geminiApiKeyInput: document.getElementById("gemini-api-key"),
     btnBegin: document.getElementById("btn-begin-interview"),
     
     // Interview UI
