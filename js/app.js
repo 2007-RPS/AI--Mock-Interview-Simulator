@@ -85,8 +85,14 @@ document.getElementById("btn-home").addEventListener("click", resetApp);
 // --- Core Flow Functions ---
 
 function startInterview() {
-    const allRoleQuestions = questionBank[state.selectedRole] || [];
-    state.questions = allRoleQuestions.slice(0, 5);
+    state.questions = getRandomQuestions(state.selectedRole, state.difficulty, 5);
+    
+    // Safety check - if we couldn't get 5 questions for some reason, don't start
+    if (state.questions.length < 5) {
+        alert("Not enough questions available for this role and difficulty.");
+        return;
+    }
+
     state.currentQuestionIndex = 0;
     state.answers = [];
     state.results = [];
