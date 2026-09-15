@@ -213,6 +213,46 @@
             </div>
         </section>
 
+        <!-- CODING SCREEN -->
+        <section id="screen-coding" class="screen hidden">
+            <div class="scene-container" aria-hidden="true">
+                <div class="orb-main interview-orb"></div>
+            </div>
+
+            <div class="interview-container" style="max-width: 900px;">
+                <header class="interview-header">
+                    <span class="role-badge">Adaptive Coding Challenge</span>
+                </header>
+                
+                <div class="question-container" style="text-align: left;">
+                    <h2 id="coding-title" class="question-text" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></h2>
+                    <p id="coding-description" style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1rem;"></p>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <strong style="color: var(--text-primary); font-size: 0.85rem; text-transform: uppercase;">Examples</strong>
+                        <pre id="coding-examples" style="margin: 0.5rem 0 0 0; white-space: pre-wrap; font-family: monospace; font-size: 0.85rem; color: var(--text-secondary);"></pre>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <strong style="color: var(--text-primary); font-size: 0.85rem; text-transform: uppercase;">Constraints</strong>
+                        <pre id="coding-constraints" style="margin: 0.5rem 0 0 0; white-space: pre-wrap; font-family: monospace; font-size: 0.85rem; color: var(--text-secondary);"></pre>
+                    </div>
+                    
+                    <div class="input-area">
+                        <textarea id="coding-input" style="font-family: monospace; min-height: 250px; background: rgba(0,0,0,0.2); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.1);" spellcheck="false"></textarea>
+                        
+                        <div class="interview-controls" style="justify-content: flex-end; gap: 1rem;">
+                            <button id="btn-skip-coding" class="btn-secondary">Skip</button>
+                            <button id="btn-run-code" class="btn-primary" style="background: transparent; border: 1px solid var(--primary);">Run Code</button>
+                            <button id="btn-submit-code" class="btn-primary btn-glow" disabled>Submit Code</button>
+                        </div>
+                    </div>
+                    
+                    <div id="coding-results-area" style="margin-top: 1.5rem; min-height: 50px;"></div>
+                </div>
+            </div>
+        </section>
+
         <!-- RESULTS SCREEN -->
         <section id="screen-results" class="screen hidden">
             <!-- 3D Decorative Scene -->
@@ -284,9 +324,12 @@
     <script src="js/questionGenerator.js"></script>
     <script src="js/analyzer.js"></script>
     <script src="js/recommendationEngine.js"></script>
+    <script src="js/codingProblems.js"></script>
+    <script src="js/codingEngine.js"></script>
     <script src="js/feedback.js"></script>
     <script src="js/timer.js"></script>
     <script src="js/ui.js"></script>
+    <script src="js/codingUI.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

@@ -147,10 +147,7 @@ function submitCurrentAnswer(reason) {
     ui.showFeedback(analysis, feedbackStrings, isLast);
 }
 
-function finishInterview() {
-    ui.renderResults(state.results, state.questions);
-    ui.showScreen(ui.resultsScreen);
-}
+// finishInterview is now handled in codingUI.js
 
 function resetApp() {
     state.selectedRole = null;
