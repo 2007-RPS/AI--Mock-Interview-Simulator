@@ -47,9 +47,16 @@ ui.geminiApiKeyInput.addEventListener("input", (e) => {
     state.geminiApiKey = e.target.value.trim() || null;
 });
 
-ui.btnBegin.addEventListener("click", () => {
+ui.btnBegin.addEventListener("click", async () => {
     if (!state.selectedRole || !state.difficulty) return;
-    startInterview();
+    
+    // UI loading state
+    ui.btnBegin.textContent = "Loading...";
+    ui.btnBegin.disabled = true;
+    
+    await startInterview();
+    
+    ui.btnBegin.textContent = "Start Interview";
 });
 
 ui.answerInput.addEventListener("input", (e) => {
@@ -84,8 +91,8 @@ document.getElementById("btn-home").addEventListener("click", resetApp);
 
 // --- Core Flow Functions ---
 
-function startInterview() {
-    state.questions = getRandomQuestions(state.selectedRole, state.difficulty, 5);
+async function startInterview() {
+    state.questions = await generateQuestionsWithAI(state.selectedRole, state.difficulty, state.geminiApiKey);
     
     // Safety check - if we couldn't get 5 questions for some reason, don't start
     if (state.questions.length < 5) {
