@@ -43,17 +43,21 @@ const ui = {
     resCatQuality: document.querySelector(".category-breakdown .breakdown-row:nth-child(3) span:last-child"),
     resCatStructure: document.querySelector(".category-breakdown .breakdown-row:nth-child(4) span:last-child"),
     resCatComm: document.querySelector(".category-breakdown .breakdown-row:nth-child(5) span:last-child"),
+    resCodingScore: document.getElementById("results-coding-score"),
     resStrengths: document.getElementById("results-strengths"),
     resImprovements: document.getElementById("results-improvements"),
+    resRecommendations: document.getElementById("results-recommendations"),
+    resOverallRec: document.getElementById("results-overall-recommendation"),
     resQuestionReview: document.getElementById("results-question-review"),
     
     showScreen(screenElement) {
-        [this.homeScreen, this.setupScreen, this.interviewScreen, this.resultsScreen].forEach(s => {
-            s.classList.remove("active");
-            s.classList.add("hidden");
+        [this.homeScreen, this.setupScreen, this.interviewScreen, this.codingScreen, this.resultsScreen].forEach(s => {
+            if(s) {
+                s.classList.remove("active");
+                s.classList.add("hidden");
+            }
         });
         screenElement.classList.remove("hidden");
-        // small timeout to allow display:block to apply before animating opacity
         setTimeout(() => {
             screenElement.classList.add("active");
         }, 50);
@@ -135,7 +139,7 @@ const ui = {
         
         // Update Button
         if (isLastQuestion) {
-            this.btnNext.innerHTML = "View Results &rarr;";
+            this.btnNext.innerHTML = "Continue &rarr;";
         } else {
             this.btnNext.innerHTML = "Next Question &rarr;";
         }
@@ -175,33 +179,52 @@ const ui = {
         this.resCatStructure.textContent = `${avgStructure} / 100`;
         this.resCatComm.textContent = `${avgComm} / 100`;
         
-        // Overall Strengths and Improvements
-        this.resStrengths.innerHTML = "";
-        this.resImprovements.innerHTML = "";
-        
-        // Strengths
-        if (avgConcept >= 70) this.addListItem(this.resStrengths, "Strong concept coverage", "✓", "var(--success)");
-        if (avgQuality >= 75) this.addListItem(this.resStrengths, "Appropriate answer completeness", "✓", "var(--success)");
-        if (avgStructure >= 75) this.addListItem(this.resStrengths, "Clear and logical structure", "✓", "var(--success)");
-        if (avgComm >= 80) this.addListItem(this.resStrengths, "Good professional communication", "✓", "var(--success)");
-        
-        if (this.resStrengths.children.length === 0) {
-            this.addListItem(this.resStrengths, "Attempted all questions", "✓", "var(--success)");
+        if (state.codingScore !== null && state.codingScore !== undefined) {
+            this.resCodingScore.textContent = `${state.codingScore}%`;
+        } else {
+            this.resCodingScore.textContent = "Skipped";
         }
         
-        // Improvements (sort by lowest score)
-        let areas = [
-            { name: "Focus on covering all required core concepts", score: avgConcept },
-            { name: "Provide more complete answers with appropriate detail", score: avgQuality },
-            { name: "Organize technical answers with clear explanations and examples", score: avgStructure },
-            { name: "Reduce filler words and repetitions to improve clarity", score: avgComm }
-        ];
-        areas.sort((a, b) => a.score - b.score);
+        // Clear lists
+        this.resStrengths.innerHTML = "";
+        this.resImprovements.innerHTML = "";
+        this.resRecommendations.innerHTML = "";
         
-        // Pick top 2 improvements (if score < 85, else pick 1)
-        const improvementsToShow = finalScore < 85 ? 2 : 1;
-        for (let i = 0; i < improvementsToShow; i++) {
-            this.addListItem(this.resImprovements, areas[i].name, "→", "var(--warning)");
+        // Populate Strong Areas
+        if (state.weakAreas && state.weakAreas.strong.length > 0) {
+            state.weakAreas.strong.forEach(c => {
+                this.addListItem(this.resStrengths, c.name, "✓", "var(--success)");
+            });
+        } else {
+            this.addListItem(this.resStrengths, "Keep practicing to build strong areas.", "✓", "var(--success)");
+        }
+        
+        // Populate Needs Practice
+        const needsPractice = (state.weakAreas && (state.weakAreas.priorityImprovement.length > 0 || state.weakAreas.needsPractice.length > 0)) 
+            ? [...state.weakAreas.priorityImprovement, ...state.weakAreas.needsPractice]
+            : [];
+            
+        if (needsPractice.length > 0) {
+            needsPractice.slice(0, 3).forEach(c => {
+                this.addListItem(this.resImprovements, c.name, "!", "var(--warning)");
+            });
+        } else {
+            this.addListItem(this.resImprovements, "No critical weak areas detected.", "!", "var(--warning)");
+        }
+        
+        // Populate Recommendations
+        if (state.weakAreas) {
+            const recs = recommendationEngine.getRecommendations(state.weakAreas);
+            if (recs.length > 0) {
+                recs.slice(0, 3).forEach(r => {
+                    this.addListItem(this.resRecommendations, r.topic, "→", "var(--primary-light)");
+                });
+                
+                this.resOverallRec.textContent = `Focus on ${recs[0].topic} before your next interview. ${recs[0].reason}`;
+            } else {
+                this.addListItem(this.resRecommendations, "Keep up the good work! Try a harder difficulty.", "→", "var(--primary-light)");
+                this.resOverallRec.textContent = "You did great. Increase the difficulty for your next session to keep growing.";
+            }
         }
         
         // Build Question Review

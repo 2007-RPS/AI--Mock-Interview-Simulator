@@ -286,23 +286,34 @@
                         <div class="breakdown-row"><span>Answer Quality</span><span>0</span></div>
                         <div class="breakdown-row"><span>Structure & Clarity</span><span>0</span></div>
                         <div class="breakdown-row"><span>Communication</span><span>0</span></div>
+                        
+                        <h4 style="margin-top: 1.5rem;">Coding Assessment</h4>
+                        <div class="breakdown-row"><span style="color:var(--primary-light);">Coding Score</span><span id="results-coding-score">N/A</span></div>
                     </div>
 
                     <div class="feedback-summary card-glass">
                         <div class="strengths-section" style="margin-bottom: 1.5rem;">
-                            <h4 style="color: var(--success); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.85rem; font-weight: 800;">Strengths</h4>
+                            <h4 style="color: var(--success); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.85rem; font-weight: 800;">Strong Areas</h4>
                             <ul id="results-strengths" style="list-style:none; padding:0; margin:0; font-size:1rem; color:var(--text-primary);">
                             </ul>
                         </div>
-                        <div class="improvements-section">
-                            <h4 style="color: var(--warning); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.85rem; font-weight: 800;">Areas to Improve</h4>
+                        <div class="improvements-section" style="margin-bottom: 1.5rem;">
+                            <h4 style="color: var(--warning); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.85rem; font-weight: 800;">Needs Practice</h4>
                             <ul id="results-improvements" style="list-style:none; padding:0; margin:0; font-size:1rem; color:var(--text-primary);">
+                            </ul>
+                        </div>
+                        <div class="recommendations-section">
+                            <h4 style="color: var(--primary-light); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.85rem; font-weight: 800;">Recommended Topics</h4>
+                            <ul id="results-recommendations" style="list-style:none; padding:0; margin:0; font-size:1rem; color:var(--text-primary);">
                             </ul>
                         </div>
                     </div>
                 </div>
 
                 <div class="question-review-section card-glass" style="margin-bottom: 3.5rem; text-align: left;">
+                    <h4 style="font-size: 1.15rem; color: var(--primary-dark); margin-bottom: 0.5rem; font-weight: 700;">Overall Recommendation</h4>
+                    <p id="results-overall-recommendation" style="color: var(--text-secondary); margin-bottom: 2rem;"></p>
+                    
                     <h4 style="font-size: 1.15rem; color: var(--primary-dark); margin-bottom: 1.25rem; font-weight: 700;">Question Review</h4>
                     <div id="results-question-review" style="display:flex; flex-direction:column; gap:1.5rem;">
                         <!-- Dynamically populated -->
