@@ -1,12 +1,15 @@
 const state = {
     selectedRole: null,
     difficulty: null,
+    interviewType: null,
     geminiApiKey: null,
     questions: [],
     currentQuestionIndex: 0,
     answers: [],
     results: [],
-    answerSubmitted: false
+    answerSubmitted: false,
+    codingScore: null,
+    weakAreas: null
 };
 
 // --- Initialization & Event Listeners ---
@@ -16,10 +19,12 @@ document.getElementById("btn-start").addEventListener("click", () => {
 });
 
 function checkStartReady() {
-    if (state.selectedRole && state.difficulty) {
+    if (state.selectedRole && state.difficulty && state.interviewType) {
         ui.btnBegin.disabled = false;
+        ui.btnBegin.textContent = "Start Interview";
     } else {
         ui.btnBegin.disabled = true;
+        ui.btnBegin.textContent = "Select Options to Start";
     }
 }
 
@@ -43,20 +48,35 @@ ui.difficultyCards.forEach(card => {
     });
 });
 
+ui.typeCards.forEach(card => {
+    card.addEventListener("click", (e) => {
+        const btn = e.currentTarget;
+        state.interviewType = btn.getAttribute("data-type");
+        ui.typeCards.forEach(c => c.classList.remove("selected"));
+        btn.classList.add("selected");
+        checkStartReady();
+    });
+});
+
 ui.geminiApiKeyInput.addEventListener("input", (e) => {
     state.geminiApiKey = e.target.value.trim() || null;
 });
 
 ui.btnBegin.addEventListener("click", async () => {
-    if (!state.selectedRole || !state.difficulty) return;
+    if (!state.selectedRole || !state.difficulty || !state.interviewType) return;
     
     // UI loading state
     ui.btnBegin.textContent = "Loading...";
     ui.btnBegin.disabled = true;
     
-    await startInterview();
-    
-    ui.btnBegin.textContent = "Start Interview";
+    if (state.interviewType === "subjective") {
+        await startInterview();
+    } else if (state.interviewType === "coding") {
+        // Prepare weakAreas as empty since subjective didn't run
+        state.weakAreas = { strong: [], developing: [], needsPractice: [], priorityImprovement: [] };
+        // Defer to coding UI
+        initCodingChallenge(state.weakAreas, state.difficulty);
+    }
 });
 
 ui.answerInput.addEventListener("input", (e) => {
@@ -147,7 +167,15 @@ function submitCurrentAnswer(reason) {
     ui.showFeedback(analysis, feedbackStrings, isLast);
 }
 
-// finishInterview is now handled in codingUI.js
+function finishInterview() {
+    // Generate weak areas
+    const weakAreas = recommendationEngine.analyzeWeakAreas(state.results, state.questions);
+    state.weakAreas = weakAreas;
+    
+    // Skip coding challenge, go straight to results
+    ui.renderResults(state.results, state.questions);
+    ui.showScreen(ui.resultsScreen);
+}
 
 function resetApp() {
     state.selectedRole = null;

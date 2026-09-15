@@ -1,0 +1,12 @@
+flowchart TD
+    Input[User Input] --> App[app.js]
+    App --> Analyzer[analyzer.js]
+    Analyzer --> Norm[Normalization]
+    Norm --> Concept[Concept Matching]
+    Concept --> Quality[Quality Analysis]
+    Quality --> Structure[Structure Analysis]
+    Structure --> Comm[Communication Analysis]
+    Comm --> ScoreObj[Score Object]
+    ScoreObj --> Feedback[feedback.js]
+    Feedback --> UI[ui.js]
+    UI --> Results[Feedback / Results]

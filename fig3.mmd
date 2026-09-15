@@ -1,0 +1,14 @@
+flowchart TD
+    Raw[Raw Answer] --> Norm[Normalize Text]
+    Norm --> Empty{Is Empty?}
+    Empty -- YES --> ScoreZero[Score = 0]
+    ScoreZero --> Feedback[Generate Feedback]
+    
+    Empty -- NO --> Concept[Concept Coverage - 45%]
+    Concept --> Quality[Answer Quality - 25%]
+    Quality --> Structure[Structure & Clarity - 20%]
+    Structure --> Comm[Communication - 10%]
+    Comm --> Weighted[Weighted Score]
+    Weighted --> Clamp[Round and Clamp 0-100]
+    Clamp --> Feedback
+    Feedback --> Display[Display Feedback]

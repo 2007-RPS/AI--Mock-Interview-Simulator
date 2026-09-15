@@ -21,6 +21,9 @@ function initCodingChallenge(weakAreas, difficulty) {
     
     currentCodingProblem = selectCodingProblem(weakest, difficulty);
     
+    document.getElementById("coding-role-label").textContent = state.selectedRole;
+    document.getElementById("coding-difficulty-label").textContent = state.difficulty;
+    
     ui.codingTitle.textContent = currentCodingProblem.title;
     ui.codingDescription.textContent = currentCodingProblem.description;
     ui.codingExamples.textContent = currentCodingProblem.examples;
@@ -94,15 +97,6 @@ function renderCodingResults(results) {
     });
     
     ui.codingResultsArea.innerHTML = html;
-}
-
-// Modify finishInterview to show coding challenge instead of results immediately
-function finishInterview() {
-    // Generate weak areas
-    const weakAreas = recommendationEngine.analyzeWeakAreas(state.results, state.questions);
-    state.weakAreas = weakAreas;
-    
-    initCodingChallenge(weakAreas, state.difficulty);
 }
 
 function finishInterviewFinal() {

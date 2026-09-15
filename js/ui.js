@@ -8,6 +8,7 @@ const ui = {
     // Setup UI
     roleCards: document.querySelectorAll(".role-card[data-role]"),
     difficultyCards: document.querySelectorAll(".role-card[data-difficulty]"),
+    typeCards: document.querySelectorAll(".role-card[data-type]"),
     geminiApiKeyInput: document.getElementById("gemini-api-key"),
     btnBegin: document.getElementById("btn-begin-interview"),
     
@@ -70,9 +71,22 @@ const ui = {
     },
     
     renderQuestion(questionObj, index, total) {
-        this.roleLabel.textContent = questionObj.role;
+        this.roleLabel.textContent = `${questionObj.role} / ${questionObj.difficulty}`;
         this.questionTracker.textContent = `Question ${index + 1}/${total}`;
         this.questionText.textContent = questionObj.question;
+        
+        const sourceBadge = document.getElementById("interview-source-badge");
+        if (questionObj.source === "AI") {
+            sourceBadge.textContent = "AI Generated";
+            sourceBadge.style.color = "var(--accent-cyan)";
+            sourceBadge.style.background = "rgba(6, 182, 212, 0.15)";
+            sourceBadge.style.borderColor = "rgba(6, 182, 212, 0.3)";
+        } else {
+            sourceBadge.textContent = "Local Question Bank";
+            sourceBadge.style.color = "var(--accent-violet)";
+            sourceBadge.style.background = "rgba(168, 85, 247, 0.15)";
+            sourceBadge.style.borderColor = "rgba(168, 85, 247, 0.3)";
+        }
         
         // Update Progress
         this.progressSteps.forEach((step, i) => {
@@ -152,144 +166,165 @@ const ui = {
     },
     
     renderResults(resultsArray, questionsArray) {
-        // Calculate Averages
-        let totalScore = 0, conceptPct = 0, qualPct = 0, structPct = 0, commPct = 0;
-        
-        resultsArray.forEach(res => {
-            totalScore += res.totalScore;
-            conceptPct += res.conceptScore;
-            qualPct += res.qualityScore;
-            structPct += res.structureScore;
-            commPct += res.communicationScore;
-        });
-        
-        const count = resultsArray.length;
-        const finalScore = Math.round(totalScore / count);
-        
-        const avgConcept = Math.round(conceptPct / count);
-        const avgQuality = Math.round(qualPct / count);
-        const avgStructure = Math.round(structPct / count);
-        const avgComm = Math.round(commPct / count);
-        
-        this.overallScoreNum.textContent = finalScore;
-        this.readinessLabel.textContent = feedbackEngine.getReadinessLevel(finalScore);
-        
-        this.resCatConcept.textContent = `${avgConcept} / 100`;
-        this.resCatQuality.textContent = `${avgQuality} / 100`;
-        this.resCatStructure.textContent = `${avgStructure} / 100`;
-        this.resCatComm.textContent = `${avgComm} / 100`;
-        
-        if (state.codingScore !== null && state.codingScore !== undefined) {
-            this.resCodingScore.textContent = `${state.codingScore}%`;
-        } else {
-            this.resCodingScore.textContent = "Skipped";
-        }
-        
-        // Clear lists
-        this.resStrengths.innerHTML = "";
-        this.resImprovements.innerHTML = "";
-        this.resRecommendations.innerHTML = "";
-        
-        // Populate Strong Areas
-        if (state.weakAreas && state.weakAreas.strong.length > 0) {
-            state.weakAreas.strong.forEach(c => {
-                this.addListItem(this.resStrengths, c.name, "✓", "var(--success)");
-            });
-        } else {
-            this.addListItem(this.resStrengths, "Keep practicing to build strong areas.", "✓", "var(--success)");
-        }
-        
-        // Populate Needs Practice
-        const needsPractice = (state.weakAreas && (state.weakAreas.priorityImprovement.length > 0 || state.weakAreas.needsPractice.length > 0)) 
-            ? [...state.weakAreas.priorityImprovement, ...state.weakAreas.needsPractice]
-            : [];
+        document.getElementById("subjective-results-section").style.display = "none";
+        document.getElementById("coding-results-section").style.display = "none";
+        document.getElementById("results-subtitle").textContent = state.interviewType === "coding" ? "Coding Assessment Results" : "Subjective Interview Analysis";
+
+        if (state.interviewType === "subjective") {
+            document.getElementById("subjective-results-section").style.display = "block";
+            let totalScore = 0;
+            let conceptPct = 0, qualPct = 0, structPct = 0, commPct = 0;
+            let count = resultsArray.length;
             
-        if (needsPractice.length > 0) {
-            needsPractice.slice(0, 3).forEach(c => {
-                this.addListItem(this.resImprovements, c.name, "!", "var(--warning)");
+            resultsArray.forEach(res => {
+                totalScore += res.totalScore;
+                conceptPct += res.conceptScore;
+                qualPct += res.qualityScore;
+                structPct += res.structureScore;
+                commPct += res.communicationScore;
             });
-        } else {
-            this.addListItem(this.resImprovements, "No critical weak areas detected.", "!", "var(--warning)");
-        }
-        
-        // Populate Recommendations
-        if (state.weakAreas) {
-            const recs = recommendationEngine.getRecommendations(state.weakAreas);
-            if (recs.length > 0) {
-                recs.slice(0, 3).forEach(r => {
-                    this.addListItem(this.resRecommendations, r.topic, "→", "var(--primary-light)");
+            
+            const finalScore = Math.round(totalScore / count);
+            const avgConcept = Math.round(conceptPct / count);
+            const avgQuality = Math.round(qualPct / count);
+            const avgStructure = Math.round(structPct / count);
+            const avgComm = Math.round(commPct / count);
+            
+            this.overallScoreNum.textContent = finalScore;
+            this.readinessLabel.textContent = feedbackEngine.getReadinessLevel(finalScore);
+            
+            this.resCatConcept.textContent = `${avgConcept} / 100`;
+            this.resCatQuality.textContent = `${avgQuality} / 100`;
+            this.resCatStructure.textContent = `${avgStructure} / 100`;
+            this.resCatComm.textContent = `${avgComm} / 100`;
+            
+            // Clear lists
+            this.resStrengths.innerHTML = "";
+            this.resImprovements.innerHTML = "";
+            this.resRecommendations.innerHTML = "";
+            
+            // Populate Strong Areas
+            if (state.weakAreas && state.weakAreas.strong.length > 0) {
+                state.weakAreas.strong.forEach(c => {
+                    this.addListItem(this.resStrengths, c.name, "✓", "var(--success)");
                 });
-                
-                this.resOverallRec.textContent = `Focus on ${recs[0].topic} before your next interview. ${recs[0].reason}`;
             } else {
-                this.addListItem(this.resRecommendations, "Keep up the good work! Try a harder difficulty.", "→", "var(--primary-light)");
-                this.resOverallRec.textContent = "You did great. Increase the difficulty for your next session to keep growing.";
+                this.addListItem(this.resStrengths, "Keep practicing to build strong areas.", "✓", "var(--success)");
+            }
+            
+            // Populate Needs Practice
+            const needsWork = [];
+            if (state.weakAreas) {
+                if (state.weakAreas.priorityImprovement) needsWork.push(...state.weakAreas.priorityImprovement);
+                if (state.weakAreas.needsPractice) needsWork.push(...state.weakAreas.needsPractice);
+            }
+            
+            if (needsWork.length > 0) {
+                needsWork.forEach(c => {
+                    this.addListItem(this.resImprovements, c.name, "!", "var(--warning)");
+                });
+            } else {
+                this.addListItem(this.resImprovements, "No critical weaknesses detected.", "!", "var(--warning)");
+            }
+            
+            // Populate Recommendations
+            const recommendedConcepts = recommendationEngine.getRecommendedTopics(state.selectedRole, state.weakAreas);
+            recommendedConcepts.forEach(c => {
+                this.addListItem(this.resRecommendations, c, "→", "var(--primary)");
+            });
+            
+            this.resOverallRec.textContent = recommendationEngine.generateOverallActionPlan ? recommendationEngine.generateOverallActionPlan(finalScore, state.weakAreas) : "Review the feedback above to improve your skills.";
+            
+            // Build Question Review
+            this.resQuestionReview.innerHTML = "";
+            resultsArray.forEach((res, i) => {
+                const qObj = questionsArray[i];
+                
+                const reviewCard = document.createElement("div");
+                reviewCard.style.padding = "1rem";
+                reviewCard.style.background = "rgba(255,255,255,0.6)";
+                reviewCard.style.borderRadius = "var(--radius-md)";
+                reviewCard.style.border = "1px solid rgba(255,255,255,0.8)";
+                
+                const header = document.createElement("div");
+                header.style.display = "flex";
+                header.style.justifyContent = "space-between";
+                header.style.alignItems = "center";
+                header.style.marginBottom = "0.5rem";
+                
+                const title = document.createElement("h5");
+                title.style.margin = "0";
+                title.style.fontSize = "1.05rem";
+                title.style.color = "var(--primary-dark)";
+                title.textContent = `Q${i + 1}`;
+                
+                const score = document.createElement("div");
+                score.style.fontWeight = "800";
+                score.style.color = "var(--text-primary)";
+                score.textContent = `Score: ${res.totalScore}/100`;
+                
+                header.appendChild(title);
+                header.appendChild(score);
+                
+                const qText = document.createElement("p");
+                qText.style.margin = "0 0 0.75rem 0";
+                qText.style.fontSize = "0.95rem";
+                qText.style.color = "var(--text-secondary)";
+                qText.style.fontStyle = "italic";
+                qText.textContent = `"${qObj.question}"`;
+                
+                const feedback = document.createElement("div");
+                feedback.style.fontSize = "0.9rem";
+                if (res.totalScore >= 75) {
+                    feedback.style.color = "var(--success)";
+                    const label = document.createElement("strong");
+                    label.textContent = "Strength: ";
+                    const detail = document.createTextNode(res.conceptScore >= 75 ? 'Strong concept coverage' : 'Good overall response');
+                    feedback.appendChild(label);
+                    feedback.appendChild(detail);
+                } else {
+                    feedback.style.color = "var(--error)";
+                    const missingText = res.missingConcepts.length > 0 ? res.missingConcepts.join(", ") : "Structure or clarity";
+                    const label = document.createElement("strong");
+                    label.textContent = "Missing: ";
+                    const detail = document.createTextNode(missingText);
+                    feedback.appendChild(label);
+                    feedback.appendChild(detail);
+                }
+                
+                reviewCard.appendChild(header);
+                reviewCard.appendChild(qText);
+                reviewCard.appendChild(feedback);
+                
+                this.resQuestionReview.appendChild(reviewCard);
+            });
+        } else if (state.interviewType === "coding") {
+            document.getElementById("coding-results-section").style.display = "block";
+            
+            const prob = currentCodingProblem;
+            document.getElementById("final-coding-difficulty").textContent = state.difficulty;
+            document.getElementById("final-coding-concepts").textContent = (prob.tags || []).join(", ");
+            
+            if (state.codingScore !== null && state.codingScore !== undefined) {
+                document.getElementById("final-coding-score").textContent = `${state.codingScore}%`;
+                
+                const numTests = prob.testCases.length;
+                const passedTests = Math.round((state.codingScore / 100) * numTests);
+                document.getElementById("final-coding-tests").textContent = `${passedTests} / ${numTests}`;
+                
+                if (state.codingScore >= 80) {
+                    document.getElementById("final-coding-feedback").textContent = "Excellent work! Your code handled the requirements successfully and passed the core test cases.";
+                } else if (state.codingScore > 0) {
+                    document.getElementById("final-coding-feedback").textContent = "Good attempt. Your code passed some test cases but failed on edge cases or specific constraints. Review the failing conditions.";
+                } else {
+                    document.getElementById("final-coding-feedback").textContent = "Your code did not pass the test cases. Check for syntax errors, logical flaws, or type mismatches.";
+                }
+            } else {
+                document.getElementById("final-coding-score").textContent = "Not Attempted";
+                document.getElementById("final-coding-tests").textContent = "- / -";
+                document.getElementById("final-coding-feedback").textContent = "You chose to skip the coding assessment.";
             }
         }
-        
-        // Build Question Review
-        this.resQuestionReview.innerHTML = "";
-        resultsArray.forEach((res, i) => {
-            const qObj = questionsArray[i];
-            
-            const reviewCard = document.createElement("div");
-            reviewCard.style.padding = "1rem";
-            reviewCard.style.background = "rgba(255,255,255,0.6)";
-            reviewCard.style.borderRadius = "var(--radius-md)";
-            reviewCard.style.border = "1px solid rgba(255,255,255,0.8)";
-            
-            const header = document.createElement("div");
-            header.style.display = "flex";
-            header.style.justifyContent = "space-between";
-            header.style.alignItems = "center";
-            header.style.marginBottom = "0.5rem";
-            
-            const title = document.createElement("h5");
-            title.style.margin = "0";
-            title.style.fontSize = "1.05rem";
-            title.style.color = "var(--primary-dark)";
-            title.textContent = `Q${i + 1}`;
-            
-            const score = document.createElement("div");
-            score.style.fontWeight = "800";
-            score.style.color = "var(--text-primary)";
-            score.textContent = `Score: ${res.totalScore}/100`;
-            
-            header.appendChild(title);
-            header.appendChild(score);
-            
-            const qText = document.createElement("p");
-            qText.style.margin = "0 0 0.75rem 0";
-            qText.style.fontSize = "0.95rem";
-            qText.style.color = "var(--text-secondary)";
-            qText.style.fontStyle = "italic";
-            qText.textContent = `"${qObj.question}"`;
-            
-            const feedback = document.createElement("div");
-            feedback.style.fontSize = "0.9rem";
-            if (res.totalScore >= 75) {
-                feedback.style.color = "var(--success)";
-                const label = document.createElement("strong");
-                label.textContent = "Strength: ";
-                const detail = document.createTextNode(res.conceptScore >= 75 ? 'Strong concept coverage' : 'Good overall response');
-                feedback.appendChild(label);
-                feedback.appendChild(detail);
-            } else {
-                feedback.style.color = "var(--error)";
-                const missingText = res.missingConcepts.length > 0 ? res.missingConcepts.join(", ") : "Structure or clarity";
-                const label = document.createElement("strong");
-                label.textContent = "Missing: ";
-                const detail = document.createTextNode(missingText);
-                feedback.appendChild(label);
-                feedback.appendChild(detail);
-            }
-            
-            reviewCard.appendChild(header);
-            reviewCard.appendChild(qText);
-            reviewCard.appendChild(feedback);
-            
-            this.resQuestionReview.appendChild(reviewCard);
-        });
     },
     
     addListItem(parent, text, symbol, color) {

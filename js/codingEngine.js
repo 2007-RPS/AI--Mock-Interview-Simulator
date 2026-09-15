@@ -1,17 +1,21 @@
 const codingEngine = {
     // We create a Blob representing the Web Worker to avoid needing an external file
-    getWorkerCode() {
+    getWorkerCode(userCode, functionName) {
         return `
+            // User code starts
+            ${userCode}
+            // User code ends
+            
             self.onmessage = function(e) {
-                const { code, testCases } = e.data;
+                const { testCases } = e.data;
                 const results = [];
                 
                 try {
-                    // Safe-ish eval within worker context (no DOM access)
-                    // Construct a function that returns the user's function
-                    const userFuncStr = code + "\\n; return " + getFunctionName(code) + ";";
-                    const userFunc = new Function(userFuncStr)();
-                    
+                    let userFunc;
+                    try {
+                        userFunc = ${functionName || 'null'};
+                    } catch(e) {}
+
                     if (typeof userFunc !== 'function') {
                         throw new Error("Could not find a valid function to execute.");
                     }
@@ -43,17 +47,23 @@ const codingEngine = {
                     self.postMessage({ success: false, error: err.toString() });
                 }
             };
-            
-            function getFunctionName(code) {
-                const match = code.match(/function\\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\\s*\\(/);
-                return match ? match[1] : null;
-            }
         `;
+    },
+
+    getFunctionName(code) {
+        // match "function name("
+        let match = code.match(/function\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*\(/);
+        if (match) return match[1];
+        // match "const name = (" or "let name = function("
+        match = code.match(/(?:const|let|var)\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*=\s*(?:function|\()/);
+        return match ? match[1] : null;
     },
 
     executeCode(code, testCases, timeoutMs = 2000) {
         return new Promise((resolve, reject) => {
-            const blob = new Blob([this.getWorkerCode()], { type: "application/javascript" });
+            const funcName = this.getFunctionName(code);
+            const workerScript = this.getWorkerCode(code, funcName);
+            const blob = new Blob([workerScript], { type: "application/javascript" });
             const worker = new Worker(URL.createObjectURL(blob));
             
             let timeoutId = setTimeout(() => {
@@ -70,10 +80,10 @@ const codingEngine = {
             worker.onerror = function(e) {
                 clearTimeout(timeoutId);
                 worker.terminate();
-                resolve({ success: false, error: e.message });
+                resolve({ success: false, error: "Runtime error parsing/executing code: " + e.message });
             };
 
-            worker.postMessage({ code, testCases });
+            worker.postMessage({ testCases });
         });
     },
     
