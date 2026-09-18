@@ -56,46 +56,58 @@ function loadCodingQuestion() {
 }
 
 ui.btnRunCode.addEventListener("click", async () => {
-    const code = ui.codeInput.value;
-    ui.codingResultsArea.innerHTML = "<p>Running tests...</p>";
-    ui.btnRunCode.disabled = true;
-    
-    const results = await codingEngine.executeCode(code, currentCodingProblem.testCases);
-    
-    ui.btnRunCode.disabled = false;
-    ui.btnSubmitCode.disabled = false;
-    
-    renderCodingResults(results, false);
+    try {
+        const code = ui.codeInput.value || "";
+        ui.codingResultsArea.innerHTML = "<p>Running tests...</p>";
+        ui.btnRunCode.disabled = true;
+        
+        const results = await codingEngine.executeCode(code, currentCodingProblem.testCases);
+        
+        ui.btnRunCode.disabled = false;
+        ui.btnSubmitCode.disabled = false;
+        
+        renderCodingResults(results, false);
+    } catch (err) {
+        console.error("Run Code Error:", err);
+        ui.codingResultsArea.innerHTML = `<p style="color:var(--error);">Critical UI Error during run: ${err.message}</p>`;
+        ui.btnRunCode.disabled = false;
+    }
 });
 
 ui.btnSubmitCode.addEventListener("click", async () => {
-    if (ui.btnSubmitCode.textContent === "Next Question →") {
-        currentCodingQuestionIndex++;
-        loadCodingQuestion();
-        return;
-    }
+    try {
+        if (ui.btnSubmitCode.textContent === "Next Question →") {
+            currentCodingQuestionIndex++;
+            loadCodingQuestion();
+            return;
+        }
 
-    const code = ui.codeInput.value;
-    ui.btnRunCode.disabled = true;
-    ui.btnSubmitCode.disabled = true;
-    ui.btnSkipCoding.disabled = true;
-    ui.codingResultsArea.innerHTML = "<p>Finalizing evaluation...</p>";
-    
-    const results = await codingEngine.executeCode(code, currentCodingProblem.testCases);
-    const evaluation = codingEngine.evaluateResults(results);
-    
-    codingResultsList.push({
-        problem: currentCodingProblem,
-        evaluation: evaluation,
-        skipped: false
-    });
-    
-    renderCodingResults(results, true);
-    
-    ui.btnRunCode.style.display = "none";
-    ui.btnSkipCoding.style.display = "none";
-    ui.btnSubmitCode.textContent = "Next Question →";
-    ui.btnSubmitCode.disabled = false;
+        const code = ui.codeInput.value || "";
+        ui.btnRunCode.disabled = true;
+        ui.btnSubmitCode.disabled = true;
+        ui.btnSkipCoding.disabled = true;
+        ui.codingResultsArea.innerHTML = "<p>Finalizing evaluation...</p>";
+        
+        const results = await codingEngine.executeCode(code, currentCodingProblem.testCases);
+        const evaluation = codingEngine.evaluateResults(results);
+        
+        codingResultsList.push({
+            problem: currentCodingProblem,
+            evaluation: evaluation,
+            skipped: false
+        });
+        
+        renderCodingResults(results, true);
+        
+        ui.btnRunCode.style.display = "none";
+        ui.btnSkipCoding.style.display = "none";
+        ui.btnSubmitCode.textContent = "Next Question →";
+        ui.btnSubmitCode.disabled = false;
+    } catch (err) {
+        console.error("Submission Error:", err);
+        ui.codingResultsArea.innerHTML = `<p style="color:var(--error);">Critical UI Error during submission: ${err.message}</p>`;
+        ui.btnSubmitCode.disabled = false;
+    }
 });
 
 ui.btnSkipCoding.addEventListener("click", () => {

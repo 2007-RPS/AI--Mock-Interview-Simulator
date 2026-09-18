@@ -61,29 +61,33 @@ const codingEngine = {
 
     executeCode(code, testCases, timeoutMs = 2000) {
         return new Promise((resolve, reject) => {
-            const funcName = this.getFunctionName(code);
-            const workerScript = this.getWorkerCode(code, funcName);
-            const blob = new Blob([workerScript], { type: "application/javascript" });
-            const worker = new Worker(URL.createObjectURL(blob));
-            
-            let timeoutId = setTimeout(() => {
-                worker.terminate();
-                resolve({ success: false, error: "Execution Timeout: Code took too long to run (possible infinite loop)." });
-            }, timeoutMs);
+            try {
+                const funcName = this.getFunctionName(code);
+                const workerScript = this.getWorkerCode(code, funcName);
+                const blob = new Blob([workerScript], { type: "application/javascript" });
+                const worker = new Worker(URL.createObjectURL(blob));
+                
+                let timeoutId = setTimeout(() => {
+                    worker.terminate();
+                    resolve({ success: false, error: "Execution Timeout: Code took too long to run (possible infinite loop)." });
+                }, timeoutMs);
 
-            worker.onmessage = function(e) {
-                clearTimeout(timeoutId);
-                worker.terminate();
-                resolve(e.data);
-            };
+                worker.onmessage = function(e) {
+                    clearTimeout(timeoutId);
+                    worker.terminate();
+                    resolve(e.data);
+                };
 
-            worker.onerror = function(e) {
-                clearTimeout(timeoutId);
-                worker.terminate();
-                resolve({ success: false, error: "Runtime error parsing/executing code: " + e.message });
-            };
+                worker.onerror = function(e) {
+                    clearTimeout(timeoutId);
+                    worker.terminate();
+                    resolve({ success: false, error: "Runtime error parsing/executing code: " + e.message });
+                };
 
-            worker.postMessage({ testCases });
+                worker.postMessage({ testCases });
+            } catch (err) {
+                resolve({ success: false, error: "System Error setting up execution environment: " + err.message });
+            }
         });
     },
     

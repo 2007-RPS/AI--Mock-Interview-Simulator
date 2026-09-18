@@ -37,10 +37,12 @@ ui.roleCards.forEach(card => {
         
         // Handle Marketing Coding Restriction
         const codingCard = document.querySelector('.role-card[data-type="coding"]');
+        const warningText = document.getElementById('marketing-coding-warning');
         if (state.selectedRole === "Marketing") {
             codingCard.classList.add("disabled");
             codingCard.setAttribute("aria-disabled", "true");
-            codingCard.querySelector('h3').textContent = "Coding Challenge (DISABLED)";
+            if (warningText) warningText.style.display = "block";
+            
             if (state.interviewType === "coding") {
                 state.interviewType = "subjective"; 
             }
@@ -53,7 +55,7 @@ ui.roleCards.forEach(card => {
         } else {
             codingCard.classList.remove("disabled");
             codingCard.setAttribute("aria-disabled", "false");
-            codingCard.querySelector('h3').textContent = "Coding Challenge";
+            if (warningText) warningText.style.display = "none";
         }
         
         checkStartReady();
