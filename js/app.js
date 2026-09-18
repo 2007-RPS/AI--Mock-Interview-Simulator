@@ -42,8 +42,12 @@ ui.roleCards.forEach(card => {
             codingCard.setAttribute("aria-disabled", "true");
             codingCard.querySelector('h3').textContent = "Coding Challenge (DISABLED)";
             if (state.interviewType === "coding") {
-                state.interviewType = "subjective"; // reset to subjective automatically
-                ui.typeCards.forEach(c => c.classList.remove("selected"));
+                state.interviewType = "subjective"; 
+            }
+            // Always remove selected visually from coding
+            codingCard.classList.remove("selected");
+            // If nothing is selected or it was reset, select subjective
+            if (state.interviewType === "subjective") {
                 document.querySelector('.role-card[data-type="subjective"]').classList.add("selected");
             }
         } else {

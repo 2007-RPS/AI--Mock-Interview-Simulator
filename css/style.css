@@ -473,14 +473,15 @@ button:disabled {
 }
 
 .role-card.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-    border-color: rgba(255,255,255,0.05);
-    background: rgba(255,255,255,0.02);
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+    border-color: rgba(255,255,255,0.05) !important;
+    background: rgba(255,255,255,0.02) !important;
+    box-shadow: none !important;
 }
 
 .role-card.disabled::after {
-    display: none;
+    display: none !important;
 }
 
 .role-icon {
@@ -513,10 +514,17 @@ button:disabled {
 }
 
 .role-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    display: flex;
+    justify-content: center;
     gap: 1.5rem;
     width: 100%;
+    flex-wrap: wrap;
+}
+
+.role-grid .role-card {
+    flex: 1 1 200px;
+    max-width: 260px;
+    padding: 2rem 1.5rem;
 }
 
 .setup-info-strip span {
