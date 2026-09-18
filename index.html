@@ -125,7 +125,11 @@
                         Demo API key — used only for this session for generative questions.<br>
                         Do not use a production API key in a client-side application.
                     </p>
-                    <input type="password" id="gemini-api-key" placeholder="Enter Gemini API Key (optional)" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary); font-family: inherit;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="password" id="gemini-api-key" placeholder="Enter Gemini API Key (optional)" style="flex-grow: 1; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary); font-family: inherit;">
+                        <button id="btn-test-api" class="btn-primary" style="padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.9rem;">Test API Key</button>
+                    </div>
+                    <div id="api-key-feedback" style="margin-top: 0.75rem; font-size: 0.85rem; font-weight: 500;"></div>
                 </div>
 
                 <div class="setup-info-strip">
@@ -233,13 +237,14 @@
             </div>
 
             <div class="interview-container" style="max-width: 900px; padding: 2rem;">
-                <header class="interview-header" style="margin-bottom: 2rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 1rem;">
+                <header class="interview-header" style="margin-bottom: 2rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
                     <div style="display:flex; flex-direction:column; gap:0.5rem; text-align:left;">
                         <span class="role-badge" style="align-self: flex-start;">Adaptive Coding Challenge</span>
                         <div style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 500;">
                             <span id="coding-role-label">Role</span> / <span id="coding-difficulty-label">Difficulty</span>
                         </div>
                     </div>
+                    <span id="coding-tracker" class="question-tracker">Coding Question 1/5</span>
                 </header>
                 
                 <div class="question-container" style="text-align: left; padding: 0;">
@@ -353,19 +358,28 @@
                                 <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Tests Passed</div>
                                 <div id="final-coding-tests" style="font-size: 1.5rem; font-weight: 700; color: var(--success);">0 / 0</div>
                             </div>
-                        </div>
-
-                        <div style="margin-bottom: 2rem;">
-                            <h4 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem;">Problem Details</h4>
-                            <div style="background: rgba(255,255,255,0.5); padding: 1rem; border-radius: 8px; border: 1px solid rgba(0,0,0,0.05);">
-                                <div><strong>Difficulty:</strong> <span id="final-coding-difficulty"></span></div>
-                                <div><strong>Concepts Tested:</strong> <span id="final-coding-concepts"></span></div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Questions Attempted</div>
+                                <div id="final-coding-attempted" style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">0 / 5</div>
                             </div>
                         </div>
 
-                        <div>
-                            <h4 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem;">Feedback</h4>
-                            <p id="final-coding-feedback" style="color: var(--text-primary); line-height: 1.6;"></p>
+                        <div class="feedback-grid" style="margin-bottom: 2rem;">
+                            <div class="feedback-card">
+                                <h3>Strong Areas</h3>
+                                <ul class="feedback-list" id="coding-strong-areas"></ul>
+                            </div>
+                            <div class="feedback-card">
+                                <h3>Needs Practice</h3>
+                                <ul class="feedback-list" id="coding-needs-practice"></ul>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem;">Question Breakdown</h4>
+                            <div id="coding-question-breakdown" style="display: flex; flex-direction: column; gap: 1rem;">
+                                <!-- Breakdown injected here -->
+                            </div>
                         </div>
                     </div>
                 </div>

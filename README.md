@@ -1,4 +1,4 @@
-﻿# AI-Style Mock Interview Simulator
+# AI-Style Mock Interview Simulator
 
 > A client-side, rule-based mock interview simulator built with pure HTML5, CSS3, and Vanilla JavaScript ES6+. Designed as a B.Tech Web Development project to demonstrate applied JavaScript concepts including DOM manipulation, event handling, timer management, and deterministic scoring logic.
 
@@ -16,23 +16,19 @@ The name "AI-style" refers to the **explainable, rule-based evaluation engine** 
 
 | Feature | Details |
 |---|---|
-| **Role Selection** | Choose from Software Engineer, Data Analyst, or Marketing |
-| **Role-Specific Question Bank** | 5 curated questions per role (15 total) with keyword metadata |
-| **5-Question Interview** | Each session covers exactly 5 questions in order |
-| **60-Second Timer** | Countdown per question with visual warning states |
-| **Timeout Auto-Submit** | Answer is automatically captured when the timer reaches zero |
-| **Typed Answers** | Students type their answers into a textarea |
-| **Concept Matching** | Keyword/concept detection with word-boundary-safe regex |
+| **Role Selection** | Software Engineer, Data Analyst, or Marketing |
+| **Assessment Modes** | Subjective Interview (all roles) or Coding Challenge (SE/DA only) |
+| **Difficulty Levels** | Entry, Mid-Level, Senior |
+| **Optional AI Question Generation** | (Optional) Input a Gemini API Key to dynamically generate questions |
+| **5-Question Interview Loop** | Both subjective and coding loops loop through 5 questions with instant feedback after each |
+| **Web Worker Coding Engine** | Securely evaluates JS strings and JS-array data logic natively |
+| **Separate Coding Pools** | Algorithm questions for SE; SQL/Data Processing (mapped in JS) for Data Analyst |
+| **Concept Matching** | Keyword/concept detection with word-boundary-safe regex for subjective questions |
 | **Answer Quality Analysis** | Length-band scoring against per-question ideal word counts |
 | **Structure & Clarity Analysis** | Detects definition, explanation, example, comparison, and application signals |
 | **Communication Analysis** | Detects filler words (um, uh, like, etc.) and 4-gram phrase repetition |
-| **Explainable Scoring** | Every component score (0-100) is displayed with its weighted contribution |
-| **Instant Feedback** | Score, strengths, missing concepts, and improvement suggestion after each question |
-| **Final Results Screen** | Overall score, readiness level, category averages, and question-by-question review |
-| **Readiness Level** | Four levels: Interview Ready / Nearly Ready / Needs Practice / More Preparation Needed |
-| **Retry / Reset** | Full state reset allows a new interview to begin from scratch |
-| **Responsive Design** | Adapts from 320px mobile to 1440px desktop |
-| **Lightweight Animations** | CSS-only decorative effects; no JS animation library required |
+| **Final Results Dashboard** | Overall subjective score, strong areas, needs practice, and AI-driven recommendations |
+| **Coding Report Card** | Average coding score, tests passed, questions attempted, and a detailed breakdown |
 
 ---
 
@@ -42,12 +38,14 @@ The name "AI-style" refers to the **explainable, rule-based evaluation engine** 
 |---|---|
 | Structure | HTML5 |
 | Styling | CSS3 (custom properties, grid, flexbox, @keyframes, clamp(), backdrop-filter) |
-| Logic | Vanilla JavaScript ES6+ (no frameworks, no bundler) |
-| Fonts | Google Fonts - Inter (CDN, optional; degrades gracefully) |
+| Logic | Vanilla JavaScript ES6+ (Web Workers, async/await, Fetch API) |
+| Fonts | Google Fonts - Inter |
 
 ### What this project does NOT use
 
-- No backend or server
+- No React or frontend frameworks
+- No backend (fully client-side)
+- No required database (local state)
 - No database
 - No LLM or AI API (OpenAI, Gemini, etc.)
 - No external AI service

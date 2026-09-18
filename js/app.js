@@ -34,6 +34,24 @@ ui.roleCards.forEach(card => {
         state.selectedRole = btn.getAttribute("data-role");
         ui.roleCards.forEach(c => c.classList.remove("selected"));
         btn.classList.add("selected");
+        
+        // Handle Marketing Coding Restriction
+        const codingCard = document.querySelector('.role-card[data-type="coding"]');
+        if (state.selectedRole === "Marketing") {
+            codingCard.classList.add("disabled");
+            codingCard.setAttribute("aria-disabled", "true");
+            codingCard.querySelector('h3').textContent = "Coding Challenge (DISABLED)";
+            if (state.interviewType === "coding") {
+                state.interviewType = "subjective"; // reset to subjective automatically
+                ui.typeCards.forEach(c => c.classList.remove("selected"));
+                document.querySelector('.role-card[data-type="subjective"]').classList.add("selected");
+            }
+        } else {
+            codingCard.classList.remove("disabled");
+            codingCard.setAttribute("aria-disabled", "false");
+            codingCard.querySelector('h3').textContent = "Coding Challenge";
+        }
+        
         checkStartReady();
     });
 });
@@ -51,7 +69,14 @@ ui.difficultyCards.forEach(card => {
 ui.typeCards.forEach(card => {
     card.addEventListener("click", (e) => {
         const btn = e.currentTarget;
-        state.interviewType = btn.getAttribute("data-type");
+        const type = btn.getAttribute("data-type");
+        
+        // Prevent clicking coding if Marketing
+        if (type === "coding" && state.selectedRole === "Marketing") {
+            return;
+        }
+        
+        state.interviewType = type;
         ui.typeCards.forEach(c => c.classList.remove("selected"));
         btn.classList.add("selected");
         checkStartReady();
@@ -60,10 +85,42 @@ ui.typeCards.forEach(card => {
 
 ui.geminiApiKeyInput.addEventListener("input", (e) => {
     state.geminiApiKey = e.target.value.trim() || null;
+    ui.apiKeyFeedback.textContent = ""; // Clear feedback on typing
 });
+
+if (ui.btnTestApi) {
+    ui.btnTestApi.addEventListener("click", async () => {
+        if (!state.geminiApiKey) {
+            ui.apiKeyFeedback.textContent = "Please enter an API key first.";
+            ui.apiKeyFeedback.style.color = "var(--warning)";
+            return;
+        }
+        ui.btnTestApi.disabled = true;
+        ui.btnTestApi.textContent = "Testing...";
+        ui.apiKeyFeedback.textContent = "";
+        
+        const result = await testApiKey(state.geminiApiKey);
+        
+        ui.apiKeyFeedback.textContent = result.message;
+        if (result.valid) {
+            ui.apiKeyFeedback.style.color = "var(--success)";
+        } else {
+            ui.apiKeyFeedback.style.color = "var(--error)";
+        }
+        
+        ui.btnTestApi.disabled = false;
+        ui.btnTestApi.textContent = "Test API Key";
+    });
+}
 
 ui.btnBegin.addEventListener("click", async () => {
     if (!state.selectedRole || !state.difficulty || !state.interviewType) return;
+    
+    // Prevent invalid state execution
+    if (state.selectedRole === "Marketing" && state.interviewType === "coding") {
+        alert("Marketing does not support Coding Challenge.");
+        return;
+    }
     
     // UI loading state
     ui.btnBegin.textContent = "Loading...";

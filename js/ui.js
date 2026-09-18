@@ -10,6 +10,8 @@ const ui = {
     difficultyCards: document.querySelectorAll(".role-card[data-difficulty]"),
     typeCards: document.querySelectorAll(".role-card[data-type]"),
     geminiApiKeyInput: document.getElementById("gemini-api-key"),
+    btnTestApi: document.getElementById("btn-test-api"),
+    apiKeyFeedback: document.getElementById("api-key-feedback"),
     btnBegin: document.getElementById("btn-begin-interview"),
     
     // Interview UI
@@ -301,28 +303,77 @@ const ui = {
         } else if (state.interviewType === "coding") {
             document.getElementById("coding-results-section").style.display = "block";
             
-            const prob = currentCodingProblem;
-            document.getElementById("final-coding-difficulty").textContent = state.difficulty;
-            document.getElementById("final-coding-concepts").textContent = (prob.tags || []).join(", ");
+            const resultsList = state.codingResultsList || [];
+            let totalScore = 0;
+            let attemptedCount = 0;
+            let totalTestsPassed = 0;
+            let totalTests = 0;
+            let strongConcepts = new Set();
+            let weakConcepts = new Set();
             
-            if (state.codingScore !== null && state.codingScore !== undefined) {
-                document.getElementById("final-coding-score").textContent = `${state.codingScore}%`;
+            const breakdownContainer = document.getElementById("coding-question-breakdown");
+            breakdownContainer.innerHTML = "";
+            
+            resultsList.forEach((res, i) => {
+                const prob = res.problem;
+                let scoreText = res.skipped ? "Not Attempted" : `${res.evaluation.score}%`;
                 
-                const numTests = prob.testCases.length;
-                const passedTests = Math.round((state.codingScore / 100) * numTests);
-                document.getElementById("final-coding-tests").textContent = `${passedTests} / ${numTests}`;
-                
-                if (state.codingScore >= 80) {
-                    document.getElementById("final-coding-feedback").textContent = "Excellent work! Your code handled the requirements successfully and passed the core test cases.";
-                } else if (state.codingScore > 0) {
-                    document.getElementById("final-coding-feedback").textContent = "Good attempt. Your code passed some test cases but failed on edge cases or specific constraints. Review the failing conditions.";
-                } else {
-                    document.getElementById("final-coding-feedback").textContent = "Your code did not pass the test cases. Check for syntax errors, logical flaws, or type mismatches.";
+                if (!res.skipped) {
+                    attemptedCount++;
+                    totalScore += res.evaluation.score;
+                    totalTestsPassed += res.evaluation.passedCount;
+                    
+                    if (res.evaluation.score >= 80) {
+                        prob.concepts.forEach(c => strongConcepts.add(c));
+                    } else {
+                        prob.concepts.forEach(c => weakConcepts.add(c));
+                    }
                 }
+                totalTests += res.evaluation.totalCount || prob.testCases.length;
+                
+                // Build row
+                const div = document.createElement("div");
+                div.style.background = "rgba(255,255,255,0.6)";
+                div.style.padding = "1rem";
+                div.style.borderRadius = "8px";
+                div.style.border = "1px solid rgba(0,0,0,0.05)";
+                div.style.display = "flex";
+                div.style.justifyContent = "space-between";
+                div.style.alignItems = "center";
+                
+                let html = `<div>
+                    <h5 style="margin:0 0 0.25rem 0; font-size:1.05rem;">Q${i+1}: ${prob.title}</h5>
+                    <div style="font-size:0.85rem; color:var(--text-secondary);">${prob.concepts.join(", ")}</div>
+                </div>`;
+                
+                html += `<div style="font-weight:700; font-size:1.1rem; color:${res.skipped ? 'var(--text-secondary)' : (res.evaluation.score >= 80 ? 'var(--success)' : 'var(--warning)')}">
+                    ${scoreText}
+                </div>`;
+                
+                div.innerHTML = html;
+                breakdownContainer.appendChild(div);
+            });
+            
+            const avgScore = attemptedCount > 0 ? Math.round(totalScore / attemptedCount) : 0;
+            document.getElementById("final-coding-score").textContent = attemptedCount > 0 ? `${avgScore}%` : "Not Attempted";
+            document.getElementById("final-coding-tests").textContent = `${totalTestsPassed} / ${totalTests}`;
+            document.getElementById("final-coding-attempted").textContent = `${attemptedCount} / 5`;
+            
+            const ulStrong = document.getElementById("coding-strong-areas");
+            const ulNeeds = document.getElementById("coding-needs-practice");
+            ulStrong.innerHTML = "";
+            ulNeeds.innerHTML = "";
+            
+            if (strongConcepts.size > 0) {
+                Array.from(strongConcepts).forEach(c => this.addListItem(ulStrong, c, "✓", "var(--success)"));
             } else {
-                document.getElementById("final-coding-score").textContent = "Not Attempted";
-                document.getElementById("final-coding-tests").textContent = "- / -";
-                document.getElementById("final-coding-feedback").textContent = "You chose to skip the coding assessment.";
+                this.addListItem(ulStrong, "None identified.", "✓", "var(--success)");
+            }
+            
+            if (weakConcepts.size > 0) {
+                Array.from(weakConcepts).forEach(c => this.addListItem(ulNeeds, c, "!", "var(--warning)"));
+            } else {
+                this.addListItem(ulNeeds, "None identified.", "!", "var(--warning)");
             }
         }
     },

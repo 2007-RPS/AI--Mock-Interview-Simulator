@@ -13,16 +13,30 @@ Object.assign(ui, {
 });
 
 let currentCodingProblem = null;
+let currentCodingQuestionIndex = 0;
+let codingQuestions = [];
+let codingResultsList = [];
 
 function initCodingChallenge(weakAreas, difficulty) {
-    let weakest = [];
-    if (weakAreas.priorityImprovement.length > 0) weakest = weakAreas.priorityImprovement;
-    else if (weakAreas.needsPractice.length > 0) weakest = weakAreas.needsPractice;
-    
-    currentCodingProblem = selectCodingProblem(weakest, difficulty);
+    codingQuestions = selectCodingProblems(state.selectedRole, difficulty, 5);
+    currentCodingQuestionIndex = 0;
+    codingResultsList = [];
     
     document.getElementById("coding-role-label").textContent = state.selectedRole;
     document.getElementById("coding-difficulty-label").textContent = state.difficulty;
+    
+    loadCodingQuestion();
+    ui.showScreen(ui.codingScreen);
+}
+
+function loadCodingQuestion() {
+    if (currentCodingQuestionIndex >= codingQuestions.length) {
+        finishCodingChallenge();
+        return;
+    }
+    
+    currentCodingProblem = codingQuestions[currentCodingQuestionIndex];
+    document.getElementById("coding-tracker").textContent = `Coding Question ${currentCodingQuestionIndex + 1}/5`;
     
     ui.codingTitle.textContent = currentCodingProblem.title;
     ui.codingDescription.textContent = currentCodingProblem.description;
@@ -31,10 +45,14 @@ function initCodingChallenge(weakAreas, difficulty) {
     ui.codeInput.value = currentCodingProblem.starterCode;
     ui.codingResultsArea.innerHTML = "";
     
+    ui.btnRunCode.style.display = "inline-block";
+    ui.btnSubmitCode.style.display = "inline-block";
+    ui.btnSubmitCode.textContent = "Submit Code";
+    ui.btnSkipCoding.style.display = "inline-block";
+    
     ui.btnRunCode.disabled = false;
     ui.btnSubmitCode.disabled = true;
-    
-    ui.showScreen(ui.codingScreen);
+    ui.btnSkipCoding.disabled = false;
 }
 
 ui.btnRunCode.addEventListener("click", async () => {
@@ -47,10 +65,16 @@ ui.btnRunCode.addEventListener("click", async () => {
     ui.btnRunCode.disabled = false;
     ui.btnSubmitCode.disabled = false;
     
-    renderCodingResults(results);
+    renderCodingResults(results, false);
 });
 
 ui.btnSubmitCode.addEventListener("click", async () => {
+    if (ui.btnSubmitCode.textContent === "Next Question →") {
+        currentCodingQuestionIndex++;
+        loadCodingQuestion();
+        return;
+    }
+
     const code = ui.codeInput.value;
     ui.btnRunCode.disabled = true;
     ui.btnSubmitCode.disabled = true;
@@ -60,17 +84,32 @@ ui.btnSubmitCode.addEventListener("click", async () => {
     const results = await codingEngine.executeCode(code, currentCodingProblem.testCases);
     const evaluation = codingEngine.evaluateResults(results);
     
-    state.codingScore = evaluation.score;
+    codingResultsList.push({
+        problem: currentCodingProblem,
+        evaluation: evaluation,
+        skipped: false
+    });
     
-    finishInterviewFinal(); // Proceed to dashboard
+    renderCodingResults(results, true);
+    
+    ui.btnRunCode.style.display = "none";
+    ui.btnSkipCoding.style.display = "none";
+    ui.btnSubmitCode.textContent = "Next Question →";
+    ui.btnSubmitCode.disabled = false;
 });
 
 ui.btnSkipCoding.addEventListener("click", () => {
-    state.codingScore = null;
-    finishInterviewFinal();
+    codingResultsList.push({
+        problem: currentCodingProblem,
+        evaluation: { score: 0, passedCount: 0, totalCount: currentCodingProblem.testCases.length },
+        skipped: true
+    });
+    
+    currentCodingQuestionIndex++;
+    loadCodingQuestion();
 });
 
-function renderCodingResults(results) {
+function renderCodingResults(results, isSubmission) {
     ui.codingResultsArea.innerHTML = "";
     
     if (!results.success) {
@@ -83,6 +122,22 @@ function renderCodingResults(results) {
     const evalObj = codingEngine.evaluateResults(results);
     
     let html = `<div style="margin-bottom: 1rem; font-weight:bold; color:var(--primary-dark);">Score: ${evalObj.score}%</div>`;
+    
+    if (isSubmission) {
+        // Build feedback block similar to subjective
+        html += `<div style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.02); padding: 1rem; border-radius: 8px;">`;
+        html += `<h4>Feedback Summary</h4>`;
+        if (evalObj.score === 100) {
+            html += `<p style="color: var(--success); font-weight: 500;">✓ Excellent! All test cases passed.</p>`;
+        } else if (evalObj.score > 0) {
+            html += `<p style="color: var(--warning); font-weight: 500;">! Partial success. Review failing edge cases.</p>`;
+        } else {
+            html += `<p style="color: var(--error); font-weight: 500;">✗ Needs practice. Logic did not produce expected results.</p>`;
+        }
+        
+        html += `<div style="margin-top: 1rem;"><strong>Concepts tested:</strong> ${currentCodingProblem.concepts.join(", ")}</div>`;
+        html += `</div>`;
+    }
     
     evalObj.detailedResults.forEach(r => {
         if (r.passed) {
@@ -99,7 +154,8 @@ function renderCodingResults(results) {
     ui.codingResultsArea.innerHTML = html;
 }
 
-function finishInterviewFinal() {
-    ui.renderResults(state.results, state.questions);
+function finishCodingChallenge() {
+    state.codingResultsList = codingResultsList;
+    ui.renderResults([], []); // We pass empty subjective arrays, renderResults handles coding logic
     ui.showScreen(ui.resultsScreen);
 }

@@ -93,3 +93,24 @@ Important: Make sure weights sum to 100 roughly. Ensure accurate concepts for th
         return getRandomQuestions(role, difficulty, 5);
     }
 }
+
+async function testApiKey(apiKey) {
+    if (!apiKey) return { valid: false, message: "API Key is empty." };
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    try {
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: "Respond with exactly the word 'OK'." }] }]
+            })
+        });
+        if (response.ok) {
+            return { valid: true, message: "✓ Gemini API Connected" };
+        } else {
+            return { valid: false, message: "✗ API Key Invalid or Request Failed" };
+        }
+    } catch (e) {
+        return { valid: false, message: "✗ Network Error" };
+    }
+}
