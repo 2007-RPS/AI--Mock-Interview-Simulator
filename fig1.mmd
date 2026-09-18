@@ -1,0 +1,23 @@
+flowchart TD
+    User([User])
+    HTML[HTML/CSS Presentation Layer]
+    App[app.js Controller / State]
+    
+    subgraph JSModules [Relevant JS Modules]
+        UI[ui.js]
+        Timer[timer.js]
+        Questions[questions.js]
+        Analyzer[analyzer.js]
+        Feedback[feedback.js]
+    end
+    
+    Results[Feedback / Results UI]
+
+    User --> HTML
+    HTML --> App
+    App --> UI
+    App --> Timer
+    App --> Questions
+    App --> Analyzer
+    App --> Feedback
+    JSModules --> Results

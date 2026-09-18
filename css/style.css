@@ -432,6 +432,8 @@ button:disabled {
     overflow: hidden;
     color: var(--text-primary);
     border-color: rgba(255,255,255,1);
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .role-card:hover {
@@ -470,6 +472,18 @@ button:disabled {
     transform: scale(1);
 }
 
+.role-card.disabled {
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+    border-color: rgba(255,255,255,0.05) !important;
+    background: rgba(255,255,255,0.02) !important;
+    box-shadow: none !important;
+}
+
+.role-card.disabled::after {
+    display: none !important;
+}
+
 .role-icon {
     width: 65px;
     height: 65px;
@@ -491,12 +505,28 @@ button:disabled {
 .setup-info-strip {
     display: flex;
     justify-content: center;
-    gap: 2.5rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
     margin-top: 1.5rem;
     color: var(--text-secondary);
     font-size: 1rem;
     font-weight: 500;
 }
+
+.role-grid {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.role-grid .role-card {
+    flex: 1 1 200px;
+    max-width: 260px;
+    padding: 2rem 1.5rem;
+}
+
 .setup-info-strip span {
     display: flex;
     align-items: center;

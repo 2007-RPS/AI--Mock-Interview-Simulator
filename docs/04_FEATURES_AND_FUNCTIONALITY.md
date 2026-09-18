@@ -21,10 +21,10 @@ The home screen displays:
 
 ---
 
-## 2. Setup Screen â€” Role Selection
+## 2. Setup Screen — Role, Difficulty, and Mode
 
 **Purpose:** Allow the user to choose an interview role before starting.  
-**User interaction:** Click one of three role cards, then click "Start Interview".  
+**User interaction:** Select Role, Difficulty, and Interview Type, then click "Start Interview".  
 **Internal logic:**
 - Each `.role-card` button has a `data-role` attribute
 - Click listener reads `event.currentTarget.getAttribute("data-role")` â†’ stores in `state.selectedRole`
@@ -272,3 +272,31 @@ For Q5 (index 4), `finishInterview()` is called instead.
 **`prefers-reduced-motion`:** All animations are disabled via media query for users who prefer reduced motion.  
 **Files:** `style.css`, `animations.js` (placeholder for future JS animations)
 
+
+
+## 18. Assessment Modes & Difficulty
+
+**Purpose:** Allow users to tailor the interview.
+**Implementation:** User selects Easy, Intermediate, or Hard, and Subjective or Coding mode. Marketing role is restricted to Subjective mode only.
+**Files:** `app.js`, `ui.js`
+
+
+## 19. Coding Challenge Mode
+
+**Purpose:** Evaluate technical coding skills.
+**Implementation:** 5-question loop executing inside a Web Worker. Separate pools for SE (Algorithms) and DA (Data processing). Evaluates against hidden test cases and generates a Final Coding Report Card.
+**Files:** `codingEngine.js`, `codingUI.js`, `codingProblems.js`
+
+
+## 20. Optional AI Question Generation
+
+**Purpose:** Generate dynamic subjective questions.
+**Implementation:** Uses `questionGenerator.js` to call the Gemini API if a key is provided. Validates response and falls back to local question bank if it fails.
+**Files:** `questionGenerator.js`
+
+
+## 21. Weak Area Recommendations
+
+**Purpose:** Suggest study topics based on subjective performance.
+**Implementation:** `recommendationEngine.js` aggregates missing concepts and classifies them into priority areas.
+**Files:** `recommendationEngine.js`

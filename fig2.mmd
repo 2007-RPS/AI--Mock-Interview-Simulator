@@ -1,0 +1,13 @@
+flowchart TD
+    Home([Home]) --> Role[Role Selection]
+    Role --> Begin[Begin Interview]
+    Begin --> Load[Load Question]
+    Load --> Timer[Start 60-Second Timer]
+    Timer --> Answer[User Types Answer]
+    Answer --> Submit[Manual Submit / Timer Reaches 0]
+    Submit --> Eval[Evaluate Answer]
+    Eval --> Feedback[Show Feedback]
+    Feedback --> More{More Questions?}
+    More -- YES --> Next[Next Question]
+    Next --> Load
+    More -- NO --> Results([Results])
