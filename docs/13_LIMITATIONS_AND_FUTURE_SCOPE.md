@@ -1,4 +1,4 @@
-﻿# 13 — Limitations and Future Scope
+# 13 — Limitations and Future Scope
 
 ## Overview
 
@@ -38,9 +38,8 @@ This is an accepted trade-off in the MVP. The penalty is small (−10 points fro
 
 ---
 
-### 4. Fixed Question Order
-
-Questions are always presented in the same order for each role. There is no shuffling or adaptive selection. A user who practises the same role multiple times will see the same 5 questions in the same order.
+### 4. Limited Role Support for Coding
+Currently, only Software Engineer and Data Analyst roles support the Coding Challenge. Marketing and other future subjective roles cannot take a coding assessment.
 
 ---
 
@@ -59,15 +58,13 @@ When the browser tab is closed or refreshed, the entire session is lost. There i
 - Score history
 - Progress tracking over multiple sessions
 
-This is intentional per the assignment specification.
-
 ---
 
 ### 7. No Backend
 
 The application is entirely client-side. There is no:
 - Server
-- API endpoint
+- API endpoint (other than external Gemini calls)
 - Database
 - Authentication system
 - User accounts
@@ -77,18 +74,6 @@ The application is entirely client-side. There is no:
 ### 8. Structure Detection is Heuristic
 
 Structure scoring detects signal words (`because`, `for example`, etc.). A perfectly structured, logically organized answer that does not use these specific signal words will score 0 on structure. Conversely, an answer containing `"because"` in an unrelated context will receive structure credit.
-
----
-
-### 9. No Adaptive Difficulty
-
-All questions have fixed difficulty. The application does not adjust based on how well the user is performing.
-
----
-
-### 10. Small Question Bank
-
-Each role has exactly 5 questions. Repeated use of the simulator will quickly result in familiarity with the questions, reducing the training value.
 
 ---
 
@@ -102,18 +87,15 @@ Each role has exactly 5 questions. Repeated use of the simulator will quickly re
 - Transcribe speech to text and pass to the existing evaluation engine
 - No server required — Web Speech API is browser-native
 
-### V2.2 — Semantic Evaluation Layer
+### V2.2 — LLM-based Semantic Evaluation Layer
 
-- Optionally call an LLM API (e.g. Gemini API, OpenAI API) for semantic evaluation
+- Expand the Gemini integration to perform deep semantic evaluation of answers
 - Use as a supplementary scoring layer alongside the existing rule-based engine
-- Requires an API key and network access
 
-### V2.3 — Expanded Question Bank
+### V2.3 — Expanded Roles
 
-- More roles (e.g. Product Manager, UI/UX Designer, DevOps)
-- More questions per role (10–20)
-- Question shuffling for varied practice sessions
-- Difficulty tags (beginner / intermediate / advanced)
+- Add more roles (e.g. Product Manager, UI/UX Designer, DevOps)
+- Develop specific coding challenge equivalents (e.g. SQL simulators, CSS challenges)
 
 ### V2.4 — User Accounts and Progress Tracking
 
@@ -121,7 +103,6 @@ Each role has exactly 5 questions. Repeated use of the simulator will quickly re
 - User authentication
 - Interview history
 - Score trends over time
-- Personal weak area identification
 
 ### V2.5 — Adaptive Follow-Up Questions
 
@@ -132,11 +113,8 @@ Each role has exactly 5 questions. Repeated use of the simulator will quickly re
 
 - Dashboard showing progress across multiple sessions
 - Concept coverage heat map
-- Most commonly missed concepts
-- Filler word frequency trend
 
 ### V2.7 — Export and Sharing
 
 - Export results as PDF
-- Share score summary link
 - Embed in LMS (Moodle, Canvas)

@@ -21,3 +21,9 @@ To adhere to secure execution best practices:
 - The `eval()` function is strictly prohibited in the codebase.
 - The `new Function()` constructor has been removed. User code is injected as a parsed string when initializing the Web Worker.
 - Functions like `document.write` or assignment to `innerHTML` with unsanitized user content are avoided.
+
+## Gemini API Security
+The application supports an optional Gemini API key for dynamic question generation.
+- **Client-Side Storage**: The API key is ONLY stored in browser memory during the active session. It is never persisted to `localStorage`, `sessionStorage`, or cookies.
+- **Transmission**: The key is transmitted directly from the client to Google's API endpoints via HTTPS.
+- **Disclaimer**: Since this is a client-side application, any API key entered is technically exposed to anyone with access to the user's browser memory or network debugging tools. The application UI explicitly advises using temporary or restricted keys for demonstration purposes.

@@ -1,4 +1,4 @@
-﻿# 03 â€” System Architecture
+# 03 — System Architecture
 
 ## Overview
 
@@ -24,19 +24,18 @@ The AI-Style Mock Interview Simulator is a single-page application (SPA) built e
 ## Module Dependency Order (load order in index.html)
 
 ```
-animations.js   (no dependencies)
-    |
-questions.js    (no dependencies - defines questionBank)
-    |
-analyzer.js     (no dependencies - defines analyzer)
-    |
-feedback.js     (no dependencies - defines feedbackEngine)
-    |
-timer.js        (no dependencies - defines timer)
-    |
-ui.js           (depends on feedbackEngine)
-    |
-app.js          (depends on all above: ui, analyzer, feedbackEngine, timer, questionBank)
+animations.js   
+questions.js            (Static subjective question bank)
+questionGenerator.js    (Optional Gemini API integration)
+analyzer.js             (Deterministic evaluation engine)
+recommendationEngine.js (Weak area diagnosis logic)
+codingProblems.js       (Static coding challenge bank)
+codingEngine.js         (Web Worker based code execution sandbox)
+feedback.js             (Feedback text + readiness logic)
+timer.js                (Countdown lifecycle)
+ui.js                   (DOM rendering and manipulation - Subjective)
+codingUI.js             (DOM rendering and manipulation - Coding)
+app.js                  (Central state, event listeners, application flow)
 ```
 
 ## Layer Descriptions
@@ -47,139 +46,81 @@ app.js          (depends on all above: ui, analyzer, feedbackEngine, timer, ques
 - Single HTML document containing all 4 screen sections
 - Screens: `#screen-home`, `#screen-setup`, `#screen-interview`, `#screen-results`
 - All screens are present in DOM at load time; visibility controlled by `active`/`hidden` CSS classes
-- Contains all static markup; no templating engine used
 - Loads all CSS and JS files at the bottom of `<body>`
 
 **`css/style.css`**
-- All visual styles in one file (929 lines)
+- All visual styles in one file
 - Uses CSS custom properties (variables) for the colour palette and spacing
-- Screen transitions via opacity + translateY animation
-- Decorative 3D effects (orbs, rings, geo shapes) implemented with pure CSS
 - Responsive design via `@media` queries at 900px, 768px, and 480px
-- `prefers-reduced-motion` support to disable all animations for accessibility
 
 ### Data Layer
 
 **`js/questions.js`**
-- Defines `const questionBank` â€” a plain JavaScript object
-- Three top-level keys: `"Software Engineer"`, `"Data Analyst"`, `"Marketing"`
-- Each key maps to an array of exactly 5 question objects
-- Each question object contains: `id`, `role`, `question`, `concepts[]`, `idealLength`, `structure[]`, and optionally `tip`
-- This file has no logic â€” it is pure static data
+- Static question bank for subjective interviews
+- Contains questions mapped by role and difficulty (Easy, Intermediate, Hard)
+- Each question object contains: `id`, `role`, `difficulty`, `question`, `concepts[]`, `idealLength`, `structure[]`
+
+**`js/codingProblems.js`**
+- Static question bank for coding challenges
+- Two distinct pools: `softwareEngineerCodingProblems` and `dataAnalystCodingProblems`
+- 15 questions per pool (5 Easy, 5 Intermediate, 5 Hard)
+- Defines test cases and initial boilerplate code
 
 ### Application Layer
 
 **`js/app.js`**
-- Defines and owns the central application state object:
-```js
-const state = {
-    selectedRole: null,
-    questions: [],
-    currentQuestionIndex: 0,
-    answers: [],
-    results: [],
-    answerSubmitted: false
-};
-```
-- Registers all DOM event listeners (click, input)
-- Contains the core flow functions: `startInterview`, `loadCurrentQuestion`, `submitCurrentAnswer`, `finishInterview`, `resetApp`
-- Orchestrates all other modules but does not perform DOM manipulation or scoring directly
+- Defines and owns the central application state object
+- Registers all core DOM event listeners
+- Contains the core flow functions and orchestrates module interactions
+
+**`js/questionGenerator.js`**
+- Manages optional Gemini API integration for dynamic subjective questions
+- Handles prompt construction, fetch requests, and fallback to local question bank
 
 ### Timer Layer
 
 **`js/timer.js`**
-- Defines `const timer` â€” a plain JavaScript object
-- Encapsulates the `setInterval` countdown
-- Public API: `start(durationSeconds, tickCallback, timeoutCallback)`, `stop()`, `reset()`
-- Guarantees no duplicate intervals: `stop()` is always called before any new `start()`
-- Passes control back to `app.js` via callbacks (does not touch DOM directly)
+- Encapsulates the `setInterval` countdown (60 seconds)
+- Guarantees no duplicate intervals
 
-### Evaluation Layer
+### Evaluation & Analysis Layer
 
 **`js/analyzer.js`**
-- Defines `const analyzer` â€” a plain JavaScript object
-- Contains all scoring logic
-- Methods:
-  - `normalizeText(text)` â€” lowercase, trim, strip punctuation, collapse spaces
-  - `countWords(text)` â€” returns word count (0 for empty)
-  - `matchConcepts(normalizedText, concepts)` â€” keyword matching with weighted scoring
-  - `calculateLengthScore(wordCount, idealLength)` â€” 5-band length scoring
-  - `analyzeStructure(normalizedText, expectedStructure)` â€” signal-word detection
-  - `analyzeCommunication(normalizedText, wordCount, conceptScore)` â€” filler/repetition detection
-  - `analyzeAnswer(answer, question)` â€” master method that calls all above and returns complete result object
-- No DOM access, no external calls â€” pure computation
+- Contains all subjective scoring logic (Concept Coverage, Answer Quality, Structure, Communication)
+- No DOM access, pure deterministic computation
 
-### Feedback Layer
+**`js/recommendationEngine.js`**
+- Aggregates weak concepts from subjective evaluation
+- Classifies them into "priority improvement" or "needs practice"
+- Generates final actionable study recommendations
+
+**`js/codingEngine.js`**
+- Manages Web Worker creation for secure coding execution
+- Avoids `eval()` and `new Function()` natively
+- Runs code against test cases with robust timeout and error handling
+
+### UI & Feedback Layer
 
 **`js/feedback.js`**
-- Defines `const feedbackEngine` â€” a plain JavaScript object
-- Methods:
-  - `generateFeedback(analysis, question)` â€” takes analyzer output, returns `{ strengths[], missing[], suggestions[] }`
-  - `getReadinessLevel(score)` â€” returns one of four readiness strings based on score thresholds
-- No DOM access â€” returns plain data structures
-
-### UI Layer
+- Formats analyzer output into structured strengths, missing elements, and suggestions
 
 **`js/ui.js`**
-- Defines `const ui` â€” a plain JavaScript object
-- Caches all DOM element references at initialization
-- Methods:
-  - `showScreen(screenElement)` â€” handles screen transitions
-  - `selectRoleCard(card)` â€” updates role card selected state
-  - `renderQuestion(questionObj, index, total)` â€” populates question screen
-  - `updateTimer(seconds)` â€” updates timer circle text and CSS class
-  - `updateWordCount(count)` â€” updates word count display
-  - `showFeedback(analysis, feedbackStrs, isLast)` â€” renders per-question feedback card
-  - `renderResults(resultsArray, questionsArray)` â€” builds entire results screen
-  - `addListItem(parent, text, symbol, color)` â€” safe DOM helper for list items
-- All user-visible content set via `textContent` or `createElement`/`appendChild`
-- NEVER uses `innerHTML` with user-controlled data
+- Caches subjective DOM element references
+- Handles screen transitions and subjective question rendering
+- Renders the final comprehensive results dashboard
 
-### Animation Layer
-
-**`js/animations.js`**
-- Currently an architectural placeholder (contains only a JSDoc comment)
-- All decorative animations (floating orbs, rotating rings, timer pulse, feedback slide-up) are implemented in `css/style.css` using `@keyframes`
-- Reserved for future JavaScript-driven animation logic (e.g., score counter roll-up)
-
-## Why Modular Architecture?
-
-1. **Separation of concerns** â€” each module does exactly one thing
-2. **Testability** â€” each module can be inspected and reasoned about independently
-3. **Maintainability** â€” changes to scoring do not affect UI; changes to UI do not affect scoring
-4. **Explainability** â€” every module and its responsibility can be described in one sentence
-5. **Assignment requirements** â€” demonstrates reusable functions and modular code
+**`js/codingUI.js`**
+- Handles all Coding Challenge UI interactions (Code Editor, Run, Submit)
+- Handles safe error message rendering and 5-question loop orchestration
 
 ## Data Flow Summary
 
+### Subjective Flow
 ```
-questions.js          (static data)
-    |
-    v
-app.js                (state.questions = questionBank[role].slice(0,5))
-    |
-    v
-User types answer     (ui.answerInput.value)
-    |
-    v
-timer.js              (60s countdown; onTimeout triggers submission)
-    |
-    v
-analyzer.analyzeAnswer(answerText, question)
-    |
-    v
-feedbackEngine.generateFeedback(analysis, question)
-    |
-    v
-ui.showFeedback(analysis, feedbackStrs, isLast)
-    |
-    v
-state.results.push(analysis)
-    |
-    v
-ui.renderResults(state.results, state.questions)
-    |
-    v
-Results screen displayed
+User -> Setup -> Subjective Interview -> Question -> 60s timer -> Submit -> Rule-Based Evaluation -> Feedback -> Next Question -> Final Results
 ```
 
+### Coding Flow
+```
+User -> Setup -> Coding Challenge -> Question -> Write Code -> Submit -> Web Worker execution -> Test Cases -> Score -> Feedback -> Next Question -> Final Report
+```

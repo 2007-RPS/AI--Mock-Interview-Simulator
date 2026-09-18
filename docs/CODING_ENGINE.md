@@ -22,7 +22,17 @@ The Coding Engine (`js/codingEngine.js`) provides a client-side execution enviro
 3. **Timeouts**
    A timeout (e.g., 2000ms) wraps the execution promise. If the worker does not post back a response within the limit, it is automatically terminated, protecting the application from freezing.
 
-## Test Cases
+4. **Error Handling (Bug Fix)**
+   The `executeCode` promise is wrapped in robust `try...catch` blocks to prevent unhandled exceptions from hanging the UI. If the worker fails to parse (e.g., syntax error), `worker.onerror` cleanly resolves the promise with an error flag. If the user submits unsupported syntax (e.g. Python), the engine falls back to error reporting and correctly enables the "Next Question" button.
+
+## Role-Specific Pools
+
+The coding challenge is restricted to **Software Engineer** and **Data Analyst**. Marketing candidates are restricted to Subjective interviews only.
+
+- **`softwareEngineerCodingProblems`**: Focuses on algorithms and data structures (arrays, strings, hash maps, two pointers). 15 total questions (5 Easy, 5 Intermediate, 5 Hard).
+- **`dataAnalystCodingProblems`**: Focuses on array manipulation, object aggregation, filtering, and window functions (implemented in JS rather than a SQL engine). 15 total questions (5 Easy, 5 Intermediate, 5 Hard).
+
+## Test Cases & Scoring
 A test case follows a simple structure:
 ```json
 {
@@ -30,6 +40,10 @@ A test case follows a simple structure:
   "expected": [2, 4, 6]
 }
 ```
+The score is calculated automatically based on the ratio of tests passed vs. total tests, per question.
+
+## Final Report
+After 5 questions are attempted (or skipped), a final Coding Report Card is generated showing average score (excluding skipped questions), total tests passed, and individual breakdown.
 
 ## Security Considerations
-Refer to `SECURITY.md` for detailed security caveats regarding the use of Web Workers without `eval`.
+Refer to `SECURITY.md` for detailed security caveats regarding the use of Web Workers without `eval()`.

@@ -17,9 +17,10 @@ The name "AI-style" refers to the **explainable, rule-based evaluation engine** 
 | Feature | Details |
 |---|---|
 | **Role Selection** | Software Engineer, Data Analyst, or Marketing |
+| **Difficulty Levels** | Easy, Intermediate, Hard |
 | **Assessment Modes** | Subjective Interview (all roles) or Coding Challenge (SE/DA only) |
-| **Difficulty Levels** | Entry, Mid-Level, Senior |
 | **Optional AI Question Generation** | (Optional) Input a Gemini API Key to dynamically generate questions |
+| **Weak Area Recommendations** | Rule-based concept aggregation to suggest practice topics |
 | **5-Question Interview Loop** | Both subjective and coding loops loop through 5 questions with instant feedback after each |
 | **Web Worker Coding Engine** | Securely evaluates JS strings and JS-array data logic natively |
 | **Separate Coding Pools** | Algorithm questions for SE; SQL/Data Processing (mapped in JS) for Data Analyst |
@@ -48,7 +49,7 @@ The name "AI-style" refers to the **explainable, rule-based evaluation engine** 
 - No required database (local state)
 - No database
 - No LLM or AI API (OpenAI, Gemini, etc.)
-- No external AI service
+- Optional Gemini API integration (fallback to local if key not provided)
 - No authentication
 - No persistent storage (localStorage / sessionStorage)
 - No React, Vue, or Angular
@@ -65,7 +66,11 @@ Opening `index.html` directly in a browser is all that is required to run the ap
 index.html          - Single HTML shell (4 screens)
 css/style.css       - All visual styles and responsive rules
 js/
-  questions.js      - Static question bank (data layer)
+  questions.js      - Static subjective question bank
+  codingProblems.js - Static coding challenge bank
+  questionGenerator.js - Optional Gemini API integration
+  codingEngine.js   - Web Worker based code execution sandbox
+  recommendationEngine.js - Weak area diagnosis logic
   analyzer.js       - Deterministic evaluation engine
   feedback.js       - Feedback text + readiness logic
   timer.js          - Countdown lifecycle
@@ -83,7 +88,7 @@ All modules are plain JavaScript objects loaded via script tags in dependency or
 ```
 Home Screen
   -> Click Start Interview
-Setup Screen - Choose role (Software Engineer / Data Analyst / Marketing)
+Setup Screen - Choose Role, Difficulty, and Assessment Mode
   -> Click Start Interview
 Interview Screen - Q1 of 5
   -> Type answer within 60 seconds
@@ -203,7 +208,7 @@ Or with VS Code, use the **Live Server** extension.
 - No semantic understanding - the engine detects keywords, not meaning
 - No persistent storage - refreshing the browser discards the session
 - Typed input only - voice/speech recognition is not implemented
-- Fixed question order per role
+- Questions are randomized per session from a larger pool
 - The word "like" is flagged as a filler even in technical usage
 
 ---
@@ -211,7 +216,6 @@ Or with VS Code, use the **Live Server** extension.
 ## Future Scope (Version 2)
 
 - Web Speech API for voice-based answers
-- LLM-based semantic evaluation as an optional layer
 - Adaptive follow-up questions
 - User accounts and interview history (requires backend)
 - Progress dashboard with analytics

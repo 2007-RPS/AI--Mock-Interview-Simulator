@@ -1,4 +1,4 @@
-﻿# 06 — Question Bank and Data Model
+# 06 — Question Bank and Data Model
 
 ## Overview
 
@@ -15,9 +15,9 @@ const questionBank = {
 ```
 
 - **3 roles** — Software Engineer, Data Analyst, Marketing
-- **5 questions per role** — exactly, always in the same order
-- **15 questions total**
-- **No random generation** — questions are static; the same role always yields the same 5 questions
+- **Multiple questions per role & difficulty** — Easy, Intermediate, Hard
+- **45 subjective questions total** (15 per role)
+- **Randomized Selection** — questions are shuffled and exactly 5 are picked per session
 
 ## Question Object Schema
 
