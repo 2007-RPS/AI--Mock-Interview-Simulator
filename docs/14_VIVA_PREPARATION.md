@@ -43,14 +43,17 @@ A: `questionGenerator.js` takes the user's role and difficulty, constructs a pro
 
 ## E. Coding Engine Questions
 
-**Q: How do you execute the user's code safely?**
-A: I use a Web Worker initialized via a Blob URL. The user's code string is concatenated with the test cases and executed inside the worker.
+**Q: Where is the AI in your project?**
+A: The current MVP does not use a trained machine-learning model or LLM for answer evaluation. The AI-style element is the automated decision-making pipeline. It analyzes answers using concept matching, answer length, structural signals, and communication signals, then combines them using predefined weights to generate feedback and a readiness classification. Optional Gemini integration is used only for dynamic question generation.
 
-**Q: Why not just use `eval()`?**
-A: `eval()` executes in the main thread and local scope. If a user writes an infinite loop, `eval()` would permanently freeze the entire browser tab. A Web Worker runs on a separate background thread and can be terminated. Web Workers also do not have access to the `document` or `window`, preventing malicious DOM manipulation.
+**Q: How do you execute coding submissions?**
+A: The submitted JavaScript is executed inside a Web Worker. This keeps execution off the main UI thread and allows the worker to be terminated when it exceeds the configured timeout. The system evaluates the output against predefined test cases.
 
-**Q: How do you prevent infinite loops in the Web Worker?**
-A: A `setTimeout` races against the worker's execution promise. If the worker doesn't respond with a `postMessage` within 2 seconds, the main thread calls `worker.terminate()` and rejects the promise.
+**Q: Why not eval()?**
+A: We avoid eval() because it would execute directly in the main browser context and could block the UI thread. The Web Worker approach allows the execution context to be terminated if it exceeds the timeout.
+
+**Q: Is the coding engine completely secure?**
+A: No. The Web Worker provides execution isolation from the main UI thread and timeout-based termination, but it should not be described as a production-grade security sandbox.
 
 **Q: Why is Marketing not allowed to take the Coding Challenge?**
 A: Marketing is a non-technical role in this context. The UI enforces role-relevance. If a user switches to Marketing, the coding option is automatically disabled and reset to Subjective.

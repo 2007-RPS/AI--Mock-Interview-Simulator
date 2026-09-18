@@ -341,16 +341,29 @@ const ui = {
                 div.style.justifyContent = "space-between";
                 div.style.alignItems = "center";
                 
-                let html = `<div>
-                    <h5 style="margin:0 0 0.25rem 0; font-size:1.05rem;">Q${i+1}: ${prob.title}</h5>
-                    <div style="font-size:0.85rem; color:var(--text-secondary);">${prob.concepts.join(", ")}</div>
-                </div>`;
+                const infoDiv = document.createElement("div");
                 
-                html += `<div style="font-weight:700; font-size:1.1rem; color:${res.skipped ? 'var(--text-secondary)' : (res.evaluation.score >= 80 ? 'var(--success)' : 'var(--warning)')}">
-                    ${scoreText}
-                </div>`;
+                const titleH5 = document.createElement("h5");
+                titleH5.style.margin = "0 0 0.25rem 0";
+                titleH5.style.fontSize = "1.05rem";
+                titleH5.textContent = `Q${i+1}: ${prob.title}`;
                 
-                div.innerHTML = html;
+                const conceptsDiv = document.createElement("div");
+                conceptsDiv.style.fontSize = "0.85rem";
+                conceptsDiv.style.color = "var(--text-secondary)";
+                conceptsDiv.textContent = prob.concepts.join(", ");
+                
+                infoDiv.appendChild(titleH5);
+                infoDiv.appendChild(conceptsDiv);
+                
+                const scoreDiv = document.createElement("div");
+                scoreDiv.style.fontWeight = "700";
+                scoreDiv.style.fontSize = "1.1rem";
+                scoreDiv.style.color = res.skipped ? "var(--text-secondary)" : (res.evaluation.score >= 80 ? "var(--success)" : "var(--warning)");
+                scoreDiv.textContent = scoreText;
+                
+                div.appendChild(infoDiv);
+                div.appendChild(scoreDiv);
                 breakdownContainer.appendChild(div);
             });
             

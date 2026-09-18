@@ -43,7 +43,7 @@ function loadCodingQuestion() {
     ui.codingExamples.textContent = currentCodingProblem.examples;
     ui.codingConstraints.textContent = currentCodingProblem.constraints;
     ui.codeInput.value = currentCodingProblem.starterCode;
-    ui.codingResultsArea.innerHTML = "";
+    ui.codingResultsArea.textContent = "";
     
     ui.btnRunCode.style.display = "inline-block";
     ui.btnSubmitCode.style.display = "inline-block";
@@ -58,7 +58,10 @@ function loadCodingQuestion() {
 ui.btnRunCode.addEventListener("click", async () => {
     try {
         const code = ui.codeInput.value || "";
-        ui.codingResultsArea.innerHTML = "<p>Running tests...</p>";
+        ui.codingResultsArea.textContent = "";
+        const p = document.createElement("p");
+        p.textContent = "Running tests...";
+        ui.codingResultsArea.appendChild(p);
         ui.btnRunCode.disabled = true;
         
         const results = await codingEngine.executeCode(code, currentCodingProblem.testCases);
@@ -69,14 +72,18 @@ ui.btnRunCode.addEventListener("click", async () => {
         renderCodingResults(results, false);
     } catch (err) {
         console.error("Run Code Error:", err);
-        ui.codingResultsArea.innerHTML = `<p style="color:var(--error);">Critical UI Error during run: ${err.message}</p>`;
+        ui.codingResultsArea.textContent = "";
+        const p = document.createElement("p");
+        p.style.color = "var(--error)";
+        p.textContent = `Critical UI Error during run: ${err.message}`;
+        ui.codingResultsArea.appendChild(p);
         ui.btnRunCode.disabled = false;
     }
 });
 
 ui.btnSubmitCode.addEventListener("click", async () => {
     try {
-        if (ui.btnSubmitCode.textContent === "Next Question →") {
+        if (ui.btnSubmitCode.textContent === "Next Question ➔") {
             currentCodingQuestionIndex++;
             loadCodingQuestion();
             return;
@@ -86,7 +93,10 @@ ui.btnSubmitCode.addEventListener("click", async () => {
         ui.btnRunCode.disabled = true;
         ui.btnSubmitCode.disabled = true;
         ui.btnSkipCoding.disabled = true;
-        ui.codingResultsArea.innerHTML = "<p>Finalizing evaluation...</p>";
+        ui.codingResultsArea.textContent = "";
+        const p = document.createElement("p");
+        p.textContent = "Finalizing evaluation...";
+        ui.codingResultsArea.appendChild(p);
         
         const results = await codingEngine.executeCode(code, currentCodingProblem.testCases);
         const evaluation = codingEngine.evaluateResults(results);
@@ -101,11 +111,15 @@ ui.btnSubmitCode.addEventListener("click", async () => {
         
         ui.btnRunCode.style.display = "none";
         ui.btnSkipCoding.style.display = "none";
-        ui.btnSubmitCode.textContent = "Next Question →";
+        ui.btnSubmitCode.textContent = "Next Question ➔";
         ui.btnSubmitCode.disabled = false;
     } catch (err) {
         console.error("Submission Error:", err);
-        ui.codingResultsArea.innerHTML = `<p style="color:var(--error);">Critical UI Error during submission: ${err.message}</p>`;
+        ui.codingResultsArea.textContent = "";
+        const p = document.createElement("p");
+        p.style.color = "var(--error)";
+        p.textContent = `Critical UI Error during submission: ${err.message}`;
+        ui.codingResultsArea.appendChild(p);
         ui.btnSubmitCode.disabled = false;
     }
 });
@@ -122,48 +136,107 @@ ui.btnSkipCoding.addEventListener("click", () => {
 });
 
 function renderCodingResults(results, isSubmission) {
-    ui.codingResultsArea.innerHTML = "";
+    ui.codingResultsArea.textContent = "";
     
     if (!results.success) {
-        ui.codingResultsArea.innerHTML = `<div style="color:var(--error); padding:1rem; background:rgba(255,0,0,0.1); border-radius:8px;">
-            <strong>Execution Error:</strong> ${results.error}
-        </div>`;
+        const errorDiv = document.createElement("div");
+        errorDiv.style.color = "var(--error)";
+        errorDiv.style.padding = "1rem";
+        errorDiv.style.background = "rgba(255,0,0,0.1)";
+        errorDiv.style.borderRadius = "8px";
+        
+        const strong = document.createElement("strong");
+        strong.textContent = "Execution Error: ";
+        
+        const errMsg = document.createTextNode(results.error);
+        
+        errorDiv.appendChild(strong);
+        errorDiv.appendChild(errMsg);
+        ui.codingResultsArea.appendChild(errorDiv);
         return;
     }
     
     const evalObj = codingEngine.evaluateResults(results);
     
-    let html = `<div style="margin-bottom: 1rem; font-weight:bold; color:var(--primary-dark);">Score: ${evalObj.score}%</div>`;
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.marginBottom = "1rem";
+    scoreDiv.style.fontWeight = "bold";
+    scoreDiv.style.color = "var(--primary-dark)";
+    scoreDiv.textContent = `Score: ${evalObj.score}%`;
+    ui.codingResultsArea.appendChild(scoreDiv);
     
     if (isSubmission) {
-        // Build feedback block similar to subjective
-        html += `<div style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.02); padding: 1rem; border-radius: 8px;">`;
-        html += `<h4>Feedback Summary</h4>`;
-        if (evalObj.score === 100) {
-            html += `<p style="color: var(--success); font-weight: 500;">✓ Excellent! All test cases passed.</p>`;
-        } else if (evalObj.score > 0) {
-            html += `<p style="color: var(--warning); font-weight: 500;">! Partial success. Review failing edge cases.</p>`;
-        } else {
-            html += `<p style="color: var(--error); font-weight: 500;">✗ Needs practice. Logic did not produce expected results.</p>`;
-        }
+        const fbDiv = document.createElement("div");
+        fbDiv.style.marginBottom = "1.5rem";
+        fbDiv.style.background = "rgba(0,0,0,0.02)";
+        fbDiv.style.padding = "1rem";
+        fbDiv.style.borderRadius = "8px";
         
-        html += `<div style="margin-top: 1rem;"><strong>Concepts tested:</strong> ${currentCodingProblem.concepts.join(", ")}</div>`;
-        html += `</div>`;
+        const h4 = document.createElement("h4");
+        h4.textContent = "Feedback Summary";
+        fbDiv.appendChild(h4);
+        
+        const summaryP = document.createElement("p");
+        summaryP.style.fontWeight = "500";
+        if (evalObj.score === 100) {
+            summaryP.style.color = "var(--success)";
+            summaryP.textContent = "✓ Excellent! All test cases passed.";
+        } else if (evalObj.score > 0) {
+            summaryP.style.color = "var(--warning)";
+            summaryP.textContent = "⚠ Partial success. Review failing edge cases.";
+        } else {
+            summaryP.style.color = "var(--error)";
+            summaryP.textContent = "✗ Needs practice. Logic did not produce expected results.";
+        }
+        fbDiv.appendChild(summaryP);
+        
+        const conceptsDiv = document.createElement("div");
+        conceptsDiv.style.marginTop = "1rem";
+        const cStrong = document.createElement("strong");
+        cStrong.textContent = "Concepts tested: ";
+        const cText = document.createTextNode(currentCodingProblem.concepts.join(", "));
+        conceptsDiv.appendChild(cStrong);
+        conceptsDiv.appendChild(cText);
+        fbDiv.appendChild(conceptsDiv);
+        
+        ui.codingResultsArea.appendChild(fbDiv);
     }
     
     evalObj.detailedResults.forEach(r => {
         if (r.passed) {
-            html += `<div style="color:var(--success); margin-bottom:0.5rem;">✓ Test Case ${r.index + 1}: Passed</div>`;
+            const passDiv = document.createElement("div");
+            passDiv.style.color = "var(--success)";
+            passDiv.style.marginBottom = "0.5rem";
+            passDiv.textContent = `✓ Test Case ${r.index + 1}: Passed`;
+            ui.codingResultsArea.appendChild(passDiv);
         } else {
-            html += `<div style="color:var(--error); margin-bottom:0.5rem; padding: 0.5rem; background:rgba(255,0,0,0.05); border-radius:4px;">
-                ✗ Test Case ${r.index + 1}: Failed<br>
-                <span style="font-size:0.85rem">Expected: ${JSON.stringify(r.expected)}<br>
-                Actual: ${r.error ? r.error : JSON.stringify(r.actual)}</span>
-            </div>`;
+            const failDiv = document.createElement("div");
+            failDiv.style.color = "var(--error)";
+            failDiv.style.marginBottom = "0.5rem";
+            failDiv.style.padding = "0.5rem";
+            failDiv.style.background = "rgba(255,0,0,0.05)";
+            failDiv.style.borderRadius = "4px";
+            
+            const titleSpan = document.createElement("div");
+            titleSpan.textContent = `✗ Test Case ${r.index + 1}: Failed`;
+            
+            const detailSpan = document.createElement("span");
+            detailSpan.style.fontSize = "0.85rem";
+            
+            const expText = document.createElement("div");
+            expText.textContent = `Expected: ${JSON.stringify(r.expected)}`;
+            
+            const actText = document.createElement("div");
+            actText.textContent = `Actual: ${r.error ? r.error : JSON.stringify(r.actual)}`;
+            
+            detailSpan.appendChild(expText);
+            detailSpan.appendChild(actText);
+            
+            failDiv.appendChild(titleSpan);
+            failDiv.appendChild(detailSpan);
+            ui.codingResultsArea.appendChild(failDiv);
         }
     });
-    
-    ui.codingResultsArea.innerHTML = html;
 }
 
 function finishCodingChallenge() {

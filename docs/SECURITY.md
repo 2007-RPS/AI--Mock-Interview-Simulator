@@ -6,15 +6,15 @@ The AI-Style Mock Interview Simulator is a client-side application. As a result,
 
 The Coding Challenge allows users to submit custom JavaScript which is executed by the system.
 
-### Web Worker "Sandbox"
+### Web Worker Isolated Execution
 Code evaluation happens entirely within a Web Worker instantiated via a Blob URL.
 - **Benefits:**
   - Isolates the user's script from the main DOM (document, window).
   - Protects the main application state and CSS from being tampered with.
   - Allows us to forcefully terminate the execution (`worker.terminate()`) if it encounters an infinite loop.
 - **Limitations:**
-  - A Web Worker is NOT a complete security sandbox. 
-  - This implementation provides demonstration-level isolation and prevents the coding task from blocking the main UI thread, but it is not equivalent to a production-grade secure code execution sandbox (e.g., a Dockerized backend runner or an iframe with a restrictive Content Security Policy).
+  - Web Workers provide execution isolation from the main UI thread but are not a complete production security boundary.
+  - This implementation provides demonstration-level isolation (Web Worker-based isolated execution with timeout termination) and prevents the coding task from blocking the main UI thread, but it is not equivalent to a production-grade secure code execution sandbox (e.g., a Dockerized backend runner or an iframe with a restrictive Content Security Policy).
 
 ### Dynamic Code Execution Practices
 To adhere to secure execution best practices:
